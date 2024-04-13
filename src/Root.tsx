@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, StyleSheet, SafeAreaView, Button } from 'react-native'
+import { Text, StyleSheet, SafeAreaView } from 'react-native'
 import useHandleAuthState from './hooks/useHandleAuthState'
 
 const styles = StyleSheet.create({

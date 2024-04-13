@@ -1,7 +1,6 @@
 import { auth } from '../configs/firebase'
 import { AppDispatch } from '../store'
-
-const BASE_URL = 'http://localhost:5000/goohdars/us-central1/api'
+import {API_URL} from '@env'
 
 type RequestWithDispatchParams = {
   dispatch: AppDispatch
@@ -23,7 +22,7 @@ export const requestWithDispatch = async ({
   const [request, success, failure] = types
 
   dispatch({ type: request })
-  const response = await fetch(`${BASE_URL}/${endpoint}`, {
+  const response = await fetch(`${API_URL}/${endpoint}`, {
     method,
     headers,
     ...(method != 'GET' && data ? { body: JSON.stringify(data) } : {}),
