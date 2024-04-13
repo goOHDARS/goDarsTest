@@ -1,4 +1,4 @@
-import { auth } from '../configs/firebase'
+import { auth } from '@configs/firebase'
 import { AppDispatch } from '../store'
 import {API_URL} from '@env'
 
