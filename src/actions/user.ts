@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth'
-import { auth } from '../configs/firebase'
+import { auth } from '@configs/firebase'
 import { AppDispatch } from '../store'
 
 export const GET_USER_REQUEST = '@@user/GET_USER_REQUEST'

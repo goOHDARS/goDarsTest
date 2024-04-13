@@ -1,5 +1,5 @@
 import { UnknownAction } from '@reduxjs/toolkit'
-import * as user from '../actions/user'
+import * as user from '@actions/user'
 
 type UserState = {
   loading: boolean

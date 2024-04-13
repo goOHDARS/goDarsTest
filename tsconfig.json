@@ -2,18 +2,23 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "baseUrl": ".",
     "paths": {
-      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
+      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"],
+      "@actions/*": ["./src/actions/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@types/*": ["./src/types/*"],
+      "@configs/*": ["./src/configs/*"]
     },
     "typeRoots": ["./src/types/env.d.ts"]
   },
   "no-restricted-imports": "off",
-    "@typescript-eslint/no-restricted-imports": [
-      "warn",
-      {
-        "name": "react-redux",
-        "importNames": ["useSelector", "useDispatch"],
-        "message": "Use typed hooks `useAppDispatch` and `useAppSelector` instead."
-      }
-    ]
+  "@typescript-eslint/no-restricted-imports": [
+    "warn",
+    {
+      "name": "react-redux",
+      "importNames": ["useSelector", "useDispatch"],
+      "message": "Use typed hooks `useAppDispatch` and `useAppSelector` instead."
+    }
+  ]
 }
