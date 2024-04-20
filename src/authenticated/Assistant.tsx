@@ -3,14 +3,17 @@ import { Text } from 'react-native'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { RootAuthenticatedTabBarParamList } from '.'
 
-type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/overview'>
+type Props = BottomTabScreenProps<
+  RootAuthenticatedTabBarParamList,
+  '/assistant'
+>
 
-const Overview = (props: Props) => {
+const Assistant = (props: Props) => {
   return (
     <ScreenLayout>
-      <Text>Overview</Text>
+      <Text>Assistant</Text>
     </ScreenLayout>
   )
 }
 
-export default Overview
+export default Assistant
