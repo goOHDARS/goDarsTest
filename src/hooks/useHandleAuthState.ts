@@ -1,20 +1,33 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { auth } from '@configs/firebase'
-import { useAppDispatch, useAppSelector } from './store'
+import { useAppDispatch } from './store'
 import { getCurrentUser } from '@actions/user'
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'
 
 const useHandleAuthState = () => {
   const dispatch = useAppDispatch()
-  const userLoading = useAppSelector((state) => state.user.loading)
+  const [loaded, setLoaded] = useState(false)
+  const [firstTimeUser, setFirstTimeUser] = useState(true)
 
   useEffect(() => {
     // get current user on initial load if user is logged in
-    auth.onAuthStateChanged((user) => {
-      if (user && !userLoading) {
-        dispatch(getCurrentUser())
+    auth.onAuthStateChanged(async (user) => {
+      const hasVisitied = await ReactNativeAsyncStorage.getItem('has_visited')
+      setFirstTimeUser(!Boolean(hasVisitied ?? false))
+
+      if (user && user.displayName) {
+        await dispatch(getCurrentUser())
+        setLoaded(true)
+      } else {
+        setLoaded(true)
       }
     })
   }, [])
+
+  return {
+    loaded,
+    firstTimeUser
+  }
 }
 
 export default useHandleAuthState

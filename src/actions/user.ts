@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from 'firebase/auth'
 import { auth } from '@configs/firebase'
 import { AppDispatch } from '../store'
@@ -15,9 +16,11 @@ export const SET_USER_REQUEST = '@@user/SET_USER_REQUEST'
 export const SET_USER_SUCCESS = '@@user/SET_USER_SUCCESS'
 export const SET_USER_FAILURE = '@@user/SET_USER_FAILURE'
 
+export const CLEAR_USER_ERRORS = '@@user/CLEAR_USER_ERRORS'
+
 export const getCurrentUser = () => {
   return (dispatch: AppDispatch) => {
-    authRequestWithDispatch({
+    return authRequestWithDispatch({
       dispatch,
       endpoint: 'get_current_user',
       types: [GET_USER_REQUEST, GET_USER_SUCCESS, GET_USER_FAILURE],
@@ -38,10 +41,8 @@ export const signInUser = (email: string, password: string) => {
           status: 500,
         },
       })
-      return
     }
-
-    dispatch(getCurrentUser())
+    return
   }
 }
 
@@ -56,7 +57,12 @@ export const signUpUser = (
   return async (dispatch: AppDispatch) => {
     dispatch({ type: SET_USER_REQUEST })
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
+      const userPromise = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      )
+      await updateProfile(userPromise.user, { displayName: name })
     } catch (err: any) {
       dispatch({
         type: SET_USER_FAILURE,
@@ -68,7 +74,7 @@ export const signUpUser = (
       return
     }
 
-    authRequestWithDispatch({
+    return authRequestWithDispatch({
       dispatch,
       endpoint: 'create_user',
       method: 'POST',
@@ -89,5 +95,11 @@ export const signOutUser = () => {
   return (dispatch: AppDispatch) => {
     dispatch({ type: GET_USER_SUCCESS, payload: undefined })
     signOut(auth)
+  }
+}
+
+export const resetUserErrors = () => {
+  return (dispatch: AppDispatch) => {
+    dispatch({ type: CLEAR_USER_ERRORS })
   }
 }

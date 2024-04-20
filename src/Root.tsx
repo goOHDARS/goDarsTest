@@ -1,23 +1,26 @@
-import React from 'react'
-import { Text, StyleSheet, SafeAreaView } from 'react-native'
 import useHandleAuthState from '@hooks/useHandleAuthState'
-
-const styles = StyleSheet.create({
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-  },
-})
+import UnauthenticatedRoot from './unauthenticated'
+import AuthenticatedRoot from './authenticated'
+import { useAppSelector } from '@hooks/store'
+import FullScreenLoader from '@components/FullScreenLoader'
 
 const Root = () => {
-  useHandleAuthState()
+  const user = useAppSelector((state) => state.user.user)
+
+  const { loaded, firstTimeUser } = useHandleAuthState()
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text>This is the root.</Text>
-    </SafeAreaView>
+    <>
+      {loaded ? (
+        user ? (
+          <AuthenticatedRoot />
+        ) : (
+          <UnauthenticatedRoot firstTimeUser={firstTimeUser} />
+        )
+      ) : (
+        <FullScreenLoader />
+      )}
+    </>
   )
 }
 
