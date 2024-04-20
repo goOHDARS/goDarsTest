@@ -8,7 +8,8 @@
       "@actions/*": ["./src/actions/*"],
       "@hooks/*": ["./src/hooks/*"],
       "@types/*": ["./src/types/*"],
-      "@configs/*": ["./src/configs/*"]
+      "@configs/*": ["./src/configs/*"],
+      "@components/*": ["./src/components/*"]
     },
     "typeRoots": ["./src/types/env.d.ts"]
   },

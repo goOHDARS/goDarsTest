@@ -1,20 +1,18 @@
 import { UnknownAction } from '@reduxjs/toolkit'
 import * as user from '@actions/user'
+import { BaseState, Error } from '.'
 
-type UserState = {
-  loading: boolean
-  error?: {
-    message: string
-    status: number
-  }
-  user?: {
-    name: string
-    major: string
-    email: string
-    pid: string
-    year: string
-    onboarded: boolean
-  }
+type User = {
+  name: string
+  major: string
+  email: string
+  pid: string
+  year: string
+  onboarded: boolean
+}
+
+type UserState = BaseState & {
+  user?: User
 }
 
 const initialState: UserState = {
@@ -23,7 +21,7 @@ const initialState: UserState = {
   user: undefined,
 }
 
-export default (state = initialState, action: UnknownAction) => {
+export default (state = initialState, action: UnknownAction): UserState => {
   switch (action.type) {
     case user.GET_USER_REQUEST:
     case user.SET_USER_REQUEST:
@@ -37,14 +35,19 @@ export default (state = initialState, action: UnknownAction) => {
         ...state,
         loading: false,
         error: undefined,
-        user: action.payload
+        user: action.payload as User,
       }
     case user.GET_USER_FAILURE:
     case user.SET_USER_FAILURE:
       return {
         ...state,
         loading: false,
-        error: action.payload
+        error: action.payload as Error,
+      }
+    case user.CLEAR_USER_ERRORS:
+      return {
+        ...state,
+        error: undefined,
       }
     default:
       return state
