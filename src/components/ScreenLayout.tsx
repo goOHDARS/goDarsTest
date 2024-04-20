@@ -6,6 +6,8 @@ import {
   ViewStyle,
   TouchableWithoutFeedback,
   Keyboard,
+  Platform,
+  StatusBar,
 } from 'react-native'
 
 const styles = StyleSheet.create({
@@ -15,6 +17,7 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
   },
 })
 

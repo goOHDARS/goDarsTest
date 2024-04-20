@@ -43,7 +43,11 @@ export const requestWithDispatch = async ({
       payload: { message: errorData.error, status: response.status },
     })
   } catch (err: any) {
-    console.log(err)
+    console.log(`request failure: ${err}`)
+    dispatch({
+      type: failure,
+      payload: { message: err, status: 500 },
+    })
   }
 
   return

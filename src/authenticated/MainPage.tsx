@@ -2,9 +2,12 @@ import { signOutUser } from '@actions/user'
 import Button from '@components/Button'
 import ScreenLayout from '@components/ScreenLayout'
 import { useAppDispatch } from '@hooks/store'
-import { Text } from 'react-native'
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
+import { RootAuthenticatedTabBarParamList } from '.'
 
-const MainPage = () => {
+type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/app'>
+
+const MainPage = (props: Props) => {
   const dispatch = useAppDispatch()
 
   return (
