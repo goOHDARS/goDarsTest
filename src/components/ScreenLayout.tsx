@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
   },
 })
 
@@ -28,7 +27,12 @@ type Props = {
 
 const ScreenLayout = ({ children, style }: Props) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { marginTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+      ]}
+    >
       <TouchableWithoutFeedback
         style={styles.container}
         onPress={Keyboard.dismiss}
