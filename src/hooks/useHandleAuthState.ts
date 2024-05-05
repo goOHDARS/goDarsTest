@@ -3,6 +3,7 @@ import { auth } from '@configs/firebase'
 import { useAppDispatch } from './store'
 import { getCurrentUser } from '@actions/user'
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'
+import { getMajorsList } from '@actions/majors'
 
 const useHandleAuthState = () => {
   const dispatch = useAppDispatch()
@@ -14,6 +15,11 @@ const useHandleAuthState = () => {
     auth.onAuthStateChanged(async (user) => {
       const hasVisitied = await ReactNativeAsyncStorage.getItem('has_visited')
       setFirstTimeUser(!Boolean(hasVisitied ?? false))
+
+      // section to get data needed for initial boot
+      if (!loaded) {
+        await dispatch(getMajorsList())
+      }
 
       if (user && user.displayName) {
         await dispatch(getCurrentUser())
