@@ -63,12 +63,17 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   const [pid, setPid] = useState('')
   const [major, setMajor] = useState('')
   const [year, setYear] = useState('')
-  const errors = useAppSelector(state => state.user.error)
-  const loading = useAppSelector(state => state.user.loading)
+  const errors = useAppSelector((state) => state.user.error)
+  const loading = useAppSelector((state) => state.user.loading)
+  const majorsList = useAppSelector((state) => state.majors.list)
 
   const { name, email, password } = route.params
 
-  const currentMajors = [{ id: '1', title: 'Computer Science' }]
+  const currentMajors = majorsList?.map((major, index) => ({
+    id: String(index + 1),
+    title: major,
+  })) ?? [{id: '1', title: 'whoops, something went wrong...'}]
+  
   const currentGradeLevels = [
     { id: '1', title: 'Freshman' },
     { id: '2', title: 'Sophomore' },
