@@ -1,5 +1,6 @@
 ### DEPENDENCIES
 - Node.js and NPM
+- Expo
 - Git and GitHub
 
 ### GETTING STARTED
