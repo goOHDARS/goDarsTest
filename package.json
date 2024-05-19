@@ -15,7 +15,7 @@
     "@react-navigation/native-stack": "^6.9.26",
     "@reduxjs/toolkit": "^2.2.3",
     "@types/feather-icons": "^4.29.4",
-    "expo": "~50.0.14",
+    "expo": "^51.0.8",
     "expo-status-bar": "~1.11.1",
     "firebase": "^10.10.0",
     "react": "18.2.0",
