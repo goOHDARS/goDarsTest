@@ -73,7 +73,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     id: String(index + 1),
     title: major,
   })) ?? [{id: '1', title: 'whoops, something went wrong...'}]
-  
+
   const currentGradeLevels = [
     { id: '1', title: 'Freshman' },
     { id: '2', title: 'Sophomore' },

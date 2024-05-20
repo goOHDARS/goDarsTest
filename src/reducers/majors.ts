@@ -18,7 +18,7 @@ const initialState: MajorsState = {
   loading: false,
   error: undefined,
   list: undefined,
-  currentMajor: undefined
+  currentMajor: undefined,
 }
 
 export default (state = initialState, action: UnknownAction): MajorsState => {

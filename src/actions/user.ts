@@ -78,7 +78,7 @@ export const signUpUser = (
     }
 
     await dispatch(getCurrentMajor())
-    
+
     return authRequestWithDispatch({
       dispatch,
       endpoint: 'create_user',

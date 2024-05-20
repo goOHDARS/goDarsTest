@@ -31,7 +31,7 @@ export const requestWithDispatch = async ({
     })
 
     if (response.ok) {
-      console.log(`request success`)
+      console.log('request success')
       dispatch({ type: success, payload: await response.json() })
       return
     }
