@@ -25,7 +25,7 @@ const bottomTabs = {
   '/assistant': {
     title: 'Assistant',
     icon: MessageSquare,
-  }
+  },
 }
 
 const styles = StyleSheet.create({

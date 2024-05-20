@@ -14,7 +14,7 @@ const useHandleAuthState = () => {
     // get current user on initial load if user is logged in
     auth.onAuthStateChanged(async (user) => {
       const hasVisitied = await ReactNativeAsyncStorage.getItem('has_visited')
-      setFirstTimeUser(!Boolean(hasVisitied ?? false))
+      setFirstTimeUser(!(hasVisitied ?? false))
 
       // section to get data needed for initial boot
       if (!loaded) {
@@ -32,7 +32,7 @@ const useHandleAuthState = () => {
 
   return {
     loaded,
-    firstTimeUser
+    firstTimeUser,
   }
 }
 
