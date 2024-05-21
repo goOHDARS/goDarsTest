@@ -28,7 +28,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 0,
     '@typescript-eslint/ban-ts-comment': 0,
     'no-console': 0,
-    semi: 'off',
+    semi: ["error", "never"], 
     'object-curly-spacing': 'off',
     'max-len': ['error', { code: 100 }],
     'operator-linebreak': 'off',
