@@ -68,8 +68,8 @@ const SignInScreen = ({ navigation }: Props) => {
   const loading = useAppSelector((state) => state.user.loading)
   const errors = useAppSelector((state) => state.user.error)
 
-  const handlePress = () => {
-    dispatch(signInUser(email, password))
+  const handlePress = async () => {
+    await dispatch(signInUser(email, password))
   }
 
   return (
