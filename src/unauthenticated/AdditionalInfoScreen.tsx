@@ -82,7 +82,8 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   ]
 
   const handlePress = () => {
-    dispatch(signUpUser(name, major, email, password, pid, +year))
+    // @Todo: add field for current semester
+    dispatch(signUpUser(name, major, email, password, pid, +year, 4))
   }
 
   useEffect(() => {
