@@ -81,8 +81,8 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     { id: '4', title: 'Senior' },
   ]
 
-  const handlePress = async () => {
-    await dispatch(signUpUser(name, major, email, password, pid, +year))
+  const handlePress = () => {
+    dispatch(signUpUser(name, major, email, password, pid, +year))
   }
 
   useEffect(() => {
