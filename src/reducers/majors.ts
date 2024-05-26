@@ -2,7 +2,8 @@ import { UnknownAction } from '@reduxjs/toolkit'
 import { BaseState, Error } from '.'
 import * as majors from '@actions/majors'
 
-type CurrentMajor = {
+type Major = {
+  id: string
   degree: string
   name: string
   planned_length: number
@@ -11,7 +12,7 @@ type CurrentMajor = {
 
 type MajorsState = BaseState & {
   list?: string[]
-  currentMajor?: CurrentMajor
+  currentMajor?: Major
 }
 
 const initialState: MajorsState = {
@@ -39,7 +40,7 @@ export default (state = initialState, action: UnknownAction): MajorsState => {
       return {
         ...state,
         loading: false,
-        currentMajor: action.payload as CurrentMajor,
+        currentMajor: action.payload as Major,
       }
     case majors.GET_MAJORS_FAILURE:
     case majors.GET_CURRENT_MAJOR_FAILURE:
