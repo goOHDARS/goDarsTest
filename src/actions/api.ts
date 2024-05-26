@@ -31,7 +31,7 @@ export const requestWithDispatch = async ({
     })
 
     if (response.ok) {
-      console.log('request success')
+      console.log(`request success: ${endpoint}`)
       dispatch({ type: success, payload: await response.json() })
       return
     }
@@ -46,7 +46,7 @@ export const requestWithDispatch = async ({
     console.log(`request failure: ${err}`)
     dispatch({
       type: failure,
-      payload: { message: err, status: 500 },
+      payload: { message: err.message, status: 500 },
     })
   }
 

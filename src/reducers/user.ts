@@ -3,11 +3,13 @@ import * as user from '@actions/user'
 import { BaseState, Error } from '.'
 
 type User = {
+  id: string
   name: string
   major: string
   email: string
   pid: string
-  year: string
+  year: number
+  semester: number
   onboarded: boolean
 }
 
