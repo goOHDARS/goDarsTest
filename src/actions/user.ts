@@ -7,7 +7,6 @@ import {
 } from 'firebase/auth'
 import { auth } from '@configs/firebase'
 import { AppDispatch } from '../store'
-import { GET_CURRENT_MAJOR_SUCCESS, getCurrentMajor } from './majors'
 
 export const GET_USER_REQUEST = '@@user/GET_USER_REQUEST'
 export const GET_USER_SUCCESS = '@@user/GET_USER_SUCCESS'
@@ -21,8 +20,6 @@ export const CLEAR_USER_ERRORS = '@@user/CLEAR_USER_ERRORS'
 
 export const getCurrentUser = () => {
   return async (dispatch: AppDispatch) => {
-    await dispatch(getCurrentMajor())
-
     return authRequestWithDispatch({
       dispatch,
       endpoint: 'get_current_user',
@@ -55,7 +52,8 @@ export const signUpUser = (
   email: string,
   password: string,
   pid: string,
-  year: number
+  year: number,
+  semester: number
 ) => {
   const newPID = 'P' + pid
   return async (dispatch: AppDispatch) => {
@@ -78,8 +76,6 @@ export const signUpUser = (
       return
     }
 
-    await dispatch(getCurrentMajor())
-
     return authRequestWithDispatch({
       dispatch,
       endpoint: 'create_user',
@@ -91,6 +87,7 @@ export const signUpUser = (
         email,
         newPID,
         year,
+        semester,
         onboarded: false,
       },
     })
@@ -99,7 +96,6 @@ export const signUpUser = (
 
 export const signOutUser = () => {
   return (dispatch: AppDispatch) => {
-    dispatch({type: GET_CURRENT_MAJOR_SUCCESS, payload: undefined})
     dispatch({ type: GET_USER_SUCCESS, payload: undefined })
     signOut(auth)
   }
