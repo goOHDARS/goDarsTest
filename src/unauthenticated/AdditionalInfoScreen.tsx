@@ -26,15 +26,44 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '90%',
   },
+  formInline: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
   textBox: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
     width: '100%',
-    padding: 10,
     borderWidth: 1,
     borderColor: '#039942',
-    marginBottom: 20,
     borderRadius: 10,
     height: 50,
+    marginBottom: 20,
+  },
+  textBoxInput: {
+    display: 'flex',
     fontSize: 20,
+    paddingLeft: 12.5,
+    height: 50,
+    width: '90%',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  disabledInputTextContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#039942',
+    height: 50,
+    width: 40,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+  disabledInputText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#ffffff',
   },
   dropDown: {
     width: '100%',
@@ -81,8 +110,9 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     { id: '4', title: 'Senior' },
   ]
 
-  const handlePress = async () => {
-    await dispatch(signUpUser(name, major, email, password, pid, +year))
+  // TODO: Add Semester to signUpUser dispatch
+  const handlePress = () => {
+    dispatch(signUpUser(name, major, email, password, pid, +year))
   }
 
   useEffect(() => {
@@ -96,16 +126,23 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
       <Text style={styles.header}>goOHDARS</Text>
       <Text style={styles.subHeader}>Additional Info</Text>
       <View style={styles.form}>
-        <TextInput
-          value={pid}
-          onChangeText={(e) => setPid(e)}
-          placeholderTextColor={'#000000'}
-          placeholder="PID"
-          style={styles.textBox}
-          autoCapitalize="none"
-          autoCorrect={false}
-          inputMode="text"
-        />
+        <View style={styles.textBox}>
+          <View style={styles.disabledInputTextContainer}>
+            <Text style={styles.disabledInputText}>
+              P
+            </Text>
+          </View>
+          <TextInput
+            value={pid}
+            onChangeText={(e) => setPid(e)}
+            placeholderTextColor={'#000000'}
+            placeholder="101..."
+            style={styles.textBoxInput}
+            autoCapitalize="none"
+            autoCorrect={false}
+            inputMode="decimal"
+          />
+        </View>
         <AutocompleteDropdown
           containerStyle={styles.dropDown}
           textInputProps={{

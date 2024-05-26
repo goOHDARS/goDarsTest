@@ -57,6 +57,7 @@ export const signUpUser = (
   pid: string,
   year: number
 ) => {
+  const newPID = 'P' + pid
   return async (dispatch: AppDispatch) => {
     dispatch({ type: SET_USER_REQUEST })
     try {
@@ -88,7 +89,7 @@ export const signUpUser = (
         name,
         major,
         email,
-        pid,
+        newPID,
         year,
         onboarded: false,
       },
