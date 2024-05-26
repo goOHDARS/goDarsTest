@@ -75,7 +75,7 @@ const Button = ({
         {children}
       </Text>
       {loading && (
-        <ActivityIndicator color="#000fff" style={{ marginLeft: 10 }} />
+        <ActivityIndicator color="#FFFFFF" style={{ marginLeft: 10 }} />
       )}
     </TouchableOpacity>
   )
