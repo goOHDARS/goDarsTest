@@ -122,7 +122,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   ]
 
   const handlePress = () => {
-    dispatch(signUpUser(name, major, email, password, pid, +year, +semester))
+    dispatch(signUpUser(name, major, email, password, 'P' + pid, +year, +semester))
   }
 
   useEffect(() => {
