@@ -26,7 +26,22 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '90%',
   },
+  formInline: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
   textBox: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#039942',
+    borderRadius: 10,
+    height: 50,
+    marginBottom: 20,
+  },
+  textBox2: {
     width: '100%',
     padding: 10,
     borderWidth: 1,
@@ -35,6 +50,30 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     height: 50,
     fontSize: 20,
+  },
+  textBoxInput: {
+    display: 'flex',
+    fontSize: 20,
+    paddingLeft: 12.5,
+    height: 50,
+    width: '90%',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  disabledInputTextContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#039942',
+    height: 50,
+    width: 40,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+  disabledInputText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#ffffff',
   },
   dropDown: {
     width: '100%',
@@ -63,6 +102,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   const [pid, setPid] = useState('')
   const [major, setMajor] = useState('')
   const [year, setYear] = useState('')
+  const [semester, setSemester] = useState('')
   const errors = useAppSelector((state) => state.user.error)
   const loading = useAppSelector((state) => state.user.loading)
   const majorsList = useAppSelector((state) => state.majors.list)
@@ -82,8 +122,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   ]
 
   const handlePress = () => {
-    // @Todo: add field for current semester
-    dispatch(signUpUser(name, major, email, password, pid, +year, 4))
+    dispatch(signUpUser(name, major, email, password, 'P' + pid, +year, +semester))
   }
 
   useEffect(() => {
@@ -97,16 +136,23 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
       <Text style={styles.header}>goOHDARS</Text>
       <Text style={styles.subHeader}>Additional Info</Text>
       <View style={styles.form}>
-        <TextInput
-          value={pid}
-          onChangeText={(e) => setPid(e)}
-          placeholderTextColor={'#000000'}
-          placeholder="PID"
-          style={styles.textBox}
-          autoCapitalize="none"
-          autoCorrect={false}
-          inputMode="text"
-        />
+        <View style={styles.textBox}>
+          <View style={styles.disabledInputTextContainer}>
+            <Text style={styles.disabledInputText}>
+              P
+            </Text>
+          </View>
+          <TextInput
+            value={pid}
+            onChangeText={(e) => setPid(e)}
+            placeholderTextColor={'#000000'}
+            placeholder="101..."
+            style={styles.textBoxInput}
+            autoCapitalize="none"
+            autoCorrect={false}
+            inputMode="decimal"
+          />
+        </View>
         <AutocompleteDropdown
           containerStyle={styles.dropDown}
           textInputProps={{
@@ -137,8 +183,19 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           closeOnSubmit={false}
           dataSet={currentGradeLevels}
         />
+        <TextInput
+          value={semester}
+          onChangeText={(e) => setSemester(e)}
+          placeholder="Current Semester"
+          placeholderTextColor={'black'}
+          style={styles.textBox2}
+          autoCapitalize="none"
+          autoCorrect={false}
+          inputMode='numeric'
+          keyboardType='number-pad'
+        />
         <Button
-          disabled={!pid || !major || !year}
+          disabled={!pid || !major || !year || (pid.length != 9) || +semester < 1}
           color="#039942"
           fullWidth
           onPress={handlePress}
