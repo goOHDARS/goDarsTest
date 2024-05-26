@@ -117,7 +117,7 @@ const SignUpScreen = ({ navigation }: Props) => {
           </View>
         )}
         <Button
-          disabled={!name || !email || !password}
+          disabled={!name || !email || !password || password.length < 6 || password.length > 30}
           fullWidth
           onPress={handlePress}
         >
