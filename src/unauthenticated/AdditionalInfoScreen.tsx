@@ -110,7 +110,6 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     { id: '4', title: 'Senior' },
   ]
 
-  // TODO: Add Semester to signUpUser dispatch
   const handlePress = () => {
     // @Todo: add field for current semester
     dispatch(signUpUser(name, major, email, password, pid, +year, 4))
