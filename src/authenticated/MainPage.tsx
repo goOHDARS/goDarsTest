@@ -90,9 +90,15 @@ const MainPage = (props: Props) => {
   const springCourses: Course[] = [course, course, course, course]
   const fallCourses: Course[] = [course2, course2, course2, course2]
 
+  // const userCourses = user?.courses.map((course) => {
+  //   return (
+  //     <Year title='' fallCourses={} springCourses={}></Year>
+  //   )
+  // })
+
   return (
-    <SafeAreaView>
-      <View style={{height: '100%'}}>
+    <SafeAreaView style={{ flex: 1}}>
+      <View style={{ flex: 1 }}>
         <View style={styles.headerContainer}>
           <View style={styles.userContainer}>
             <Text style={styles.username}>{'Zachary Wolfe'}</Text>

@@ -10,8 +10,9 @@ import { Course } from 'src/reducers'
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 24,
-    fontWeight: '400',
+    fontFamily: 'Helvetica Neue',
+    fontSize: 26,
+    fontWeight: '300',
     paddingBottom: 5,
     paddingLeft: 20,
   },
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
   springSemesterContainer: {
     backgroundColor: '#024230',
     minWidth: '45%',
-    maxHeight: '100%',
+    minHeight: 350,
     borderTopRightRadius: 20,
     borderBottomRightRadius: 20,
     flexDirection: 'column',
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     backgroundColor: '#024230',
     minWidth: '45%',
-    minHeight: '100%',
+    minHeight: 350,
     borderTopLeftRadius: 20,
     borderBottomLeftRadius: 20,
     flexDirection: 'column',
@@ -96,7 +97,7 @@ const Year = (
 ) => {
   const fallSemester = fallCourses.map((course) => {
     return (
-      <View style={styles.classContainer} key={Math.floor(Math.random() * 20000)}>
+      <View style={styles.classContainer} key={course.id}>
         <Text style={styles.semesterInnerText}>{course.shortName}</Text>
         <Text style={styles.semesterInnerText}>{course.credits}</Text>
       </View>
@@ -105,7 +106,7 @@ const Year = (
 
   const springSemester = springCourses.map((course) => {
     return (
-      <View style={styles.classContainer} key={Math.floor(Math.random() * 100)}>
+      <View style={styles.classContainer} key={course.id}>
         <Text style={styles.semesterInnerText}>{course.shortName}</Text>
         <Text style={styles.semesterInnerText}>{course.credits}</Text>
       </View>
@@ -113,7 +114,7 @@ const Year = (
   })
 
   return (
-    <View style={{ flexDirection: 'column', height: '35%', overflow: 'scroll'}}>
+    <View style={{ flexDirection: 'column', overflow: 'scroll'}}>
       <Text style={styles.title}>
         {title}
       </Text>
@@ -124,11 +125,11 @@ const Year = (
             {fallSemester}
           </View>
           <Text style={styles.fallSemesterText}>
-                        Fall
+                Fall
           </Text>
         </Pressable>
         <View style= {{alignContent: 'center'}}>
-          <Divider orientation="vertical" width={3} color="#fff"/>
+          <Divider orientation="vertical" width={3} color="#ffffff"/>
         </View>
         {/* </View>onPress={() => setSeniorModalSpring(true)} */}
         <Pressable style={styles.springSemesterContainer} >
