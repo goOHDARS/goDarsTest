@@ -1,6 +1,7 @@
 import { combineReducers } from '@reduxjs/toolkit'
 import user from './user'
 import majors from './majors'
+import courses from './courses'
 
 export type Error = {
   message: string
@@ -15,4 +16,5 @@ export type BaseState = {
 export default combineReducers({
   user,
   majors,
+  courses,
 })

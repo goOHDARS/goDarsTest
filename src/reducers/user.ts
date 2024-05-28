@@ -19,8 +19,6 @@ type UserState = BaseState & {
 
 const initialState: UserState = {
   loading: false,
-  error: undefined,
-  user: undefined,
 }
 
 export default (state = initialState, action: UnknownAction): UserState => {
