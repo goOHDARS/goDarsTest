@@ -6,7 +6,103 @@ import {
 } from 'react-native'
 import React from 'react'
 import Divider from '@components/Divider'
-import { Course } from 'src/reducers'
+import { CourseBrief } from 'src/reducers/courses'
+import { useAppSelector } from '@hooks/store'
+
+/**
+ * @brief A year component that displays one of the (four)?
+ *         or more years of a student's college career
+ * @param param0 title: the title of the year the student is on
+ * @param param1 fallCourses: an array of courses the student is taking in the fall
+ * @param param2 springCourses: an array of courses the student is taking in the spring
+ * @returns React.JSX.Element
+ */
+
+const UserYears = () => {
+  const years = new Map<number, string>()
+  years.set(1, 'Freshman')
+  years.set(2, 'Sophomore')
+  years.set(3, 'Junior')
+  years.set(4, 'Senior')
+
+  const user = useAppSelector((state) => state.user?.user)
+  const userCourses = useAppSelector((state) => state.courses?.courses)
+  const major = useAppSelector((state) => state.majors.currentMajor)
+
+  const viewSemesters = []
+
+  for (let i = 1; i < (major?.planned_length ?? 8) + 1; i++) {
+    const bool = i % 2 === 1
+    const list = userCourses?.filter((course) => course.semester === i)
+    viewSemesters.push(
+      <Pressable style={(bool) ? styles.fallSemesterContainer : styles.springSemesterContainer}>
+        <View style={(bool) ? styles.fallSemester : styles.springSemester}>
+          {list?.map((course) => {
+            return (
+              <View style={styles.classContainer} key={course.id}>
+                <Text style={styles.semesterInnerText}>{course.shortName}</Text>
+                <Text style={styles.semesterInnerText}>{course.credits}</Text>
+              </View>
+            )
+          })}
+        </View>
+
+        <Text style={(bool) ? styles.fallSemesterText : styles.springSemesterText}>
+          {(bool) ? 'Fall' : 'Spring'}
+        </Text>
+
+      </Pressable>
+    )
+  }
+
+  const viewYears = []
+
+  for (let i = 0; i < viewSemesters.length; i++) {
+    if (i % 2 === 0) {
+      viewYears.push(
+        <View style={{ flexDirection: 'column', overflow: 'scroll'}}>
+          <Text style={styles.title}>
+            {(years.has(i/2 + 1) ? years.get(i/2 + 1) : 'Year ' + (i/2 + 1))}
+          </Text>
+          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+            {viewSemesters[i]}
+            <View style= {{alignContent: 'center'}}>
+              <Divider orientation="vertical" width={3} color="#ffffff"/>
+            </View>
+            {viewSemesters[i+1]}
+          </View>
+        </View>
+      )
+    }
+  }
+
+  return viewYears
+
+  // const viewCourses = courses.map((course) => {
+  //   const bool = course.semester % 2 === 0
+
+  //   return (
+  //     <Pressable style={(bool) ? styles.fallSemesterContainer : styles.springSemesterContainer}>
+  //       <View style={(bool) ? styles.fallSemester : styles.springSemester}>
+
+  //         <View style={styles.classContainer} key={course.id}>
+  //           <Text style={styles.semesterInnerText}>{course.shortName}</Text>
+  //           <Text style={styles.semesterInnerText}>{course.credits}</Text>
+  //         </View>
+
+  //       </View>
+
+  //       <Text style={(bool) ? styles.fallSemesterText : styles.springSemesterText}>
+  //           {(bool) ? 'Fall' : 'Spring'}
+  //       </Text>
+
+  //     </Pressable>
+  //   )
+  // })
+}
+
+export default UserYears
+
 
 const styles = StyleSheet.create({
   title: {
@@ -81,68 +177,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 })
-
-/**
- * @brief A year component that displays one of the (four)?
- *         or more years of a student's college career
- * @param param0 title: the title of the year the student is on
- * @param param1 fallCourses: an array of courses the student is taking in the fall
- * @param param2 springCourses: an array of courses the student is taking in the spring
- * @returns React.JSX.Element
- */
-
-const Year = (
-  {title, fallCourses, springCourses} :
-  {title: string, fallCourses: Course[], springCourses: Course[]}
-) => {
-  const fallSemester = fallCourses.map((course) => {
-    return (
-      <View style={styles.classContainer} key={course.id}>
-        <Text style={styles.semesterInnerText}>{course.shortName}</Text>
-        <Text style={styles.semesterInnerText}>{course.credits}</Text>
-      </View>
-    )
-  })
-
-  const springSemester = springCourses.map((course) => {
-    return (
-      <View style={styles.classContainer} key={course.id}>
-        <Text style={styles.semesterInnerText}>{course.shortName}</Text>
-        <Text style={styles.semesterInnerText}>{course.credits}</Text>
-      </View>
-    )
-  })
-
-  return (
-    <View style={{ flexDirection: 'column', overflow: 'scroll'}}>
-      <Text style={styles.title}>
-        {title}
-      </Text>
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-        {/* </View>onPress={() => setSeniorModalFall(true)} */}
-        <Pressable style={styles.fallSemesterContainer}>
-          <View style={styles.fallSemester}>
-            {fallSemester}
-          </View>
-          <Text style={styles.fallSemesterText}>
-                Fall
-          </Text>
-        </Pressable>
-        <View style= {{alignContent: 'center'}}>
-          <Divider orientation="vertical" width={3} color="#ffffff"/>
-        </View>
-        {/* </View>onPress={() => setSeniorModalSpring(true)} */}
-        <Pressable style={styles.springSemesterContainer} >
-          <View style={styles.springSemester}>
-            {springSemester}
-          </View>
-          <Text style={styles.springSemesterText}>
-            Spring
-          </Text>
-        </Pressable>
-      </View>
-    </View>
-  )
-}
-
-export default Year

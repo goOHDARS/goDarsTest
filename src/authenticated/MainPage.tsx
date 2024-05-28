@@ -15,8 +15,8 @@ import {
   ScrollView,
 } from 'react-native'
 import React from 'react'
-import Year from '@components/Semester'
-import { Course } from 'src/reducers'
+import UserYears from '@components/Semester'
+import { CourseBrief } from 'src/reducers/courses'
 
 type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/app'>
 
@@ -60,48 +60,14 @@ const styles = StyleSheet.create({
 })
 
 const MainPage = (props: Props) => {
-  const dispatch = useAppDispatch()
-  const user = useAppSelector((state) => state.user.user)
-
-  const course: Course = {
-    id: '1',
-    college: 'Russ College of Engineering',
-    credits: 4,
-    description: ('Introductory course in computer science. Topics include problem solving, '
-    + 'algorithm design, and data structures.'),
-    // why lint, why 100 max-len??!?!?!?!?!??!??!?!??!?!?!?!??!?!?!??!?
-    fullName: 'Introduction to Computer Science I',
-    prereq: [],
-    semester: 'Spring',
-    shortName: 'CS2400',
-  }
-
-  const course2: Course = {
-    id: '2',
-    college: 'Russ College of Engineering',
-    credits: 4,
-    description: 'Software tools and techniques for programming.',
-    fullName: 'Introduction to Computer Science I',
-    prereq: [],
-    semester: 'Fall',
-    shortName: 'CS3560',
-  }
-
-  const springCourses: Course[] = [course, course, course, course]
-  const fallCourses: Course[] = [course2, course2, course2, course2]
-
-  // const userCourses = user?.courses.map((course) => {
-  //   return (
-  //     <Year title='' fallCourses={} springCourses={}></Year>
-  //   )
-  // })
+  const user = useAppSelector((state) => state.user?.user)
 
   return (
     <SafeAreaView style={{ flex: 1}}>
       <View style={{ flex: 1 }}>
         <View style={styles.headerContainer}>
           <View style={styles.userContainer}>
-            <Text style={styles.username}>{'Zachary Wolfe'}</Text>
+            <Text style={styles.username}>{user?.name}</Text>
             <Text style={styles.major}>{user?.major}</Text>
           </View>
           <Image
@@ -112,14 +78,11 @@ const MainPage = (props: Props) => {
           />
         </View>
         <ScrollView contentContainerStyle={{ gap: 20}}>
-          <Year title='Freshman' fallCourses={fallCourses} springCourses={springCourses}></Year>
-          <Year title='Sophomore' fallCourses={fallCourses} springCourses={springCourses}></Year>
-          <Year title='Junior' fallCourses={fallCourses} springCourses={springCourses}></Year>
-          <Year title='Senior' fallCourses={fallCourses} springCourses={springCourses}></Year>
+          <UserYears></UserYears>
         </ScrollView>
         {/* <Button onPress={() => dispatch(signOutUser())} color="#039942">
-        Logout
-      </Button> */}
+          Logout
+          </Button> */}
       </View>
     </SafeAreaView>
   )

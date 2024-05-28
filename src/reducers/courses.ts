@@ -2,7 +2,7 @@ import { UnknownAction } from '@reduxjs/toolkit'
 import { BaseState, Error } from '.'
 import * as courses from '@actions/courses'
 
-type CourseBrief = {
+export type CourseBrief = {
   id: string
   fullName: string
   shortName: string
