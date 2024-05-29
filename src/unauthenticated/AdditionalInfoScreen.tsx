@@ -195,7 +195,8 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           keyboardType='number-pad'
         />
         <Button
-          disabled={!pid || !major || !year || (pid.length != 9) || +semester < 1}
+          disabled={!pid || !major || major === 'whoops, something went wrong...'
+          || !year || (pid.length != 9) || +semester < 1}
           color="#039942"
           fullWidth
           onPress={handlePress}
