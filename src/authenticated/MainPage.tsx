@@ -64,9 +64,6 @@ const MainPage = (props: Props) => {
   const user = useAppSelector((state) => state.user?.user)
   const dispatch = useAppDispatch()
 
-  console.log(user)
-  console.log(user?.photoURL)
-
   return (
     <ScreenLayout>
       <View style={{ flex: 1 }}>
