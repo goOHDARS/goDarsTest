@@ -17,6 +17,7 @@ import {
 import React from 'react'
 import UserYears from '@components/Semester'
 import { CourseBrief } from 'src/reducers/courses'
+import Button from '@components/Button'
 
 type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/app'>
 
@@ -61,9 +62,13 @@ const styles = StyleSheet.create({
 
 const MainPage = (props: Props) => {
   const user = useAppSelector((state) => state.user?.user)
+  const dispatch = useAppDispatch()
+
+  console.log(user)
+  console.log(user?.photoURL)
 
   return (
-    <SafeAreaView style={{ flex: 1}}>
+    <ScreenLayout>
       <View style={{ flex: 1 }}>
         <View style={styles.headerContainer}>
           <View style={styles.userContainer}>
@@ -72,19 +77,18 @@ const MainPage = (props: Props) => {
           </View>
           <Image
             style={styles.userImage}
-            source={{ uri: user?.photoURL ??
-            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png'}}
+            source={{ uri: user?.photoURL }}
             alt='user profile picture'
           />
         </View>
         <ScrollView contentContainerStyle={{ gap: 20}}>
           <UserYears></UserYears>
         </ScrollView>
-        {/* <Button onPress={() => dispatch(signOutUser())} color="#039942">
+        <Button onPress={() => dispatch(signOutUser())} color="#039942">
           Logout
-          </Button> */}
+        </Button>
       </View>
-    </SafeAreaView>
+    </ScreenLayout>
   )
 }
 

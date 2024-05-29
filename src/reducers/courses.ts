@@ -2,6 +2,7 @@ import { UnknownAction } from '@reduxjs/toolkit'
 import { BaseState, Error } from '.'
 import * as courses from '@actions/courses'
 
+// shown in the list of courses in the dashboard
 export type CourseBrief = {
   id: string
   fullName: string
@@ -12,6 +13,7 @@ export type CourseBrief = {
   subcategory?: string
 }
 
+// an overall course
 type Course = {
   id: string
   college: string
@@ -23,6 +25,7 @@ type Course = {
   shortName: string
 }
 
+// stored on the database
 export type UserCourse = {
   id: string
   course: string

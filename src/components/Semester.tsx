@@ -4,10 +4,11 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Divider from '@components/Divider'
 import { CourseBrief } from 'src/reducers/courses'
-import { useAppSelector } from '@hooks/store'
+import { useAppDispatch, useAppSelector } from '@hooks/store'
+import { getCurrentMajor } from '@actions/majors'
 
 /**
  * @brief A year component that displays one of the (four)?
@@ -28,6 +29,11 @@ const UserYears = () => {
   const user = useAppSelector((state) => state.user?.user)
   const userCourses = useAppSelector((state) => state.courses?.courses)
   const major = useAppSelector((state) => state.majors.currentMajor)
+  const dispatch = useAppDispatch()
+
+  useEffect(() =>{
+    dispatch(getCurrentMajor())
+  }, [])
 
   const viewSemesters = []
 
@@ -37,9 +43,9 @@ const UserYears = () => {
     viewSemesters.push(
       <Pressable style={(bool) ? styles.fallSemesterContainer : styles.springSemesterContainer}>
         <View style={(bool) ? styles.fallSemester : styles.springSemester}>
-          {list?.map((course) => {
+          {list?.map((course, index) => {
             return (
-              <View style={styles.classContainer} key={course.id}>
+              <View style={styles.classContainer} key={index}>
                 <Text style={styles.semesterInnerText}>{course.shortName}</Text>
                 <Text style={styles.semesterInnerText}>{course.credits}</Text>
               </View>
@@ -77,28 +83,6 @@ const UserYears = () => {
   }
 
   return viewYears
-
-  // const viewCourses = courses.map((course) => {
-  //   const bool = course.semester % 2 === 0
-
-  //   return (
-  //     <Pressable style={(bool) ? styles.fallSemesterContainer : styles.springSemesterContainer}>
-  //       <View style={(bool) ? styles.fallSemester : styles.springSemester}>
-
-  //         <View style={styles.classContainer} key={course.id}>
-  //           <Text style={styles.semesterInnerText}>{course.shortName}</Text>
-  //           <Text style={styles.semesterInnerText}>{course.credits}</Text>
-  //         </View>
-
-  //       </View>
-
-  //       <Text style={(bool) ? styles.fallSemesterText : styles.springSemesterText}>
-  //           {(bool) ? 'Fall' : 'Spring'}
-  //       </Text>
-
-  //     </Pressable>
-  //   )
-  // })
 }
 
 export default UserYears
