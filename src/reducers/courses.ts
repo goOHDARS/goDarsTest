@@ -40,6 +40,7 @@ type CoursesState = BaseState & {
 }
 
 const initialState: CoursesState = {
+  courses: [],
   loading: false,
 }
 
@@ -75,7 +76,7 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
         courses: state.courses?.filter(
           (course) =>
             course.shortName !==
-            (action.payload as { courseName: string }).courseName
+            (action.payload as { courseName: string }).courseName,
         ),
         error: undefined,
       }

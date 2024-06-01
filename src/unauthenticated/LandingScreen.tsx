@@ -33,9 +33,7 @@ const LandingScreen = ({ navigation }: Props) => {
     <ScreenLayout>
       <Text style={styles.header}>goOHDARS</Text>
       <Text style={styles.subtitle}>An alternative to DARS.</Text>
-      <Button onPress={handlePress}>
-        Get Started
-      </Button>
+      <Button onPress={handlePress}>Get Started</Button>
     </ScreenLayout>
   )
 }

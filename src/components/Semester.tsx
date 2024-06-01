@@ -1,9 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-} from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React, { useEffect } from 'react'
 import Divider from '@components/Divider'
 import { CourseBrief } from 'src/reducers/courses'
@@ -27,11 +22,11 @@ const UserYears = () => {
   years.set(4, 'Senior')
 
   const user = useAppSelector((state) => state.user?.user)
-  const userCourses = useAppSelector((state) => state.courses?.courses)
+  const userCourses = useAppSelector((state) => state.courses.courses)
   const major = useAppSelector((state) => state.majors.currentMajor)
   const dispatch = useAppDispatch()
 
-  useEffect(() =>{
+  useEffect(() => {
     dispatch(getCurrentMajor())
   }, [])
 
@@ -39,10 +34,15 @@ const UserYears = () => {
 
   for (let i = 1; i < (major?.planned_length ?? 8) + 1; i++) {
     const bool = i % 2 === 1
-    const list = userCourses?.filter((course) => course.semester === i)
+    const list: CourseBrief[] = userCourses?.filter((course) => course.semester === i) ?? []
+
     viewSemesters.push(
-      <Pressable style={(bool) ? styles.fallSemesterContainer : styles.springSemesterContainer}>
-        <View style={(bool) ? styles.fallSemester : styles.springSemester}>
+      <Pressable
+        style={
+          bool ? styles.fallSemesterContainer : styles.springSemesterContainer
+        }
+      >
+        <View style={bool ? styles.fallSemester : styles.springSemester}>
           {list?.map((course, index) => {
             return (
               <View style={styles.classContainer} key={index}>
@@ -53,11 +53,12 @@ const UserYears = () => {
           })}
         </View>
 
-        <Text style={(bool) ? styles.fallSemesterText : styles.springSemesterText}>
-          {(bool) ? 'Fall' : 'Spring'}
+        <Text
+          style={bool ? styles.fallSemesterText : styles.springSemesterText}
+        >
+          {bool ? 'Fall' : 'Spring'}
         </Text>
-
-      </Pressable>
+      </Pressable>,
     )
   }
 
@@ -66,18 +67,22 @@ const UserYears = () => {
   for (let i = 0; i < viewSemesters.length; i++) {
     if (i % 2 === 0) {
       viewYears.push(
-        <View style={{ flexDirection: 'column', overflow: 'scroll'}}>
+        <View style={{ flexDirection: 'column', overflow: 'scroll' }}>
           <Text style={styles.title}>
-            {(years.has(i/2 + 1) ? years.get(i/2 + 1) : 'Year ' + (i/2 + 1))}
+            {years.has(i / 2 + 1)
+              ? years.get(i / 2 + 1)
+              : 'Year ' + (i / 2 + 1)}
           </Text>
-          <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+          <View
+            style={{ flex: 1, flexDirection: 'row', justifyContent: 'center' }}
+          >
             {viewSemesters[i]}
-            <View style= {{alignContent: 'center'}}>
-              <Divider orientation="vertical" width={3} color="#ffffff"/>
+            <View style={{ alignContent: 'center' }}>
+              <Divider orientation="vertical" width={3} color="#ffffff" />
             </View>
-            {viewSemesters[i+1]}
+            {viewSemesters[i + 1]}
           </View>
-        </View>
+        </View>,
       )
     }
   }
@@ -86,7 +91,6 @@ const UserYears = () => {
 }
 
 export default UserYears
-
 
 const styles = StyleSheet.create({
   title: {

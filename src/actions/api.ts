@@ -32,7 +32,11 @@ export const requestWithDispatch = async ({
 
     if (response.ok) {
       console.log(`request success: ${endpoint}`)
-      dispatch({ type: success, payload: await response.json() })
+      const responseJSON = await response.json()
+      dispatch({ type: success, payload: responseJSON })
+      console.log('\nresponseJSON: ')
+      console.log(responseJSON)
+      console.log('\n')
       return
     }
 

@@ -1,9 +1,6 @@
 import { signOutUser } from '@actions/user'
 import ScreenLayout from '@components/ScreenLayout'
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '@hooks/store'
+import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { RootAuthenticatedTabBarParamList } from '.'
 import {
@@ -75,10 +72,10 @@ const MainPage = (props: Props) => {
           <Image
             style={styles.userImage}
             source={{ uri: user?.photoURL }}
-            alt='user profile picture'
+            alt="user profile picture"
           />
         </View>
-        <ScrollView contentContainerStyle={{ gap: 20}}>
+        <ScrollView contentContainerStyle={{ gap: 20 }}>
           <UserYears></UserYears>
         </ScrollView>
         <Button onPress={() => dispatch(signOutUser())} color="#039942">

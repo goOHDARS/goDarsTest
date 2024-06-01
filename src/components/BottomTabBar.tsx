@@ -51,7 +51,11 @@ const BottomTabBar = ({ state, navigation }: BottomTabBarProps) => {
   return (
     <View style={styles.container}>
       {state.routeNames.map((el, index) => {
-        const routeName = el as '/app' | '/course-select' | '/overview' | '/assistant'
+        const routeName = el as
+          | '/app'
+          | '/course-select'
+          | '/overview'
+          | '/assistant'
         const focused = state.index == index
         const TabIcon = bottomTabs[routeName].icon
 
