@@ -23,7 +23,7 @@ export default (
     hasEightChars && hasOneNumber && hasOneUpperCase && hasOneSpecialChar ? null :
       <View style={{ alignSelf: 'flex-start', margin: 20, marginTop: 0}}>
         <Text style={{ fontSize: 14 }}>
-                Password must contain:
+            Password must contain:
         </Text>
         {hasEightChars ? null :
           <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
@@ -31,7 +31,7 @@ export default (
               {'\u25CF '}
             </Text>
             <Text style={{ fontSize: 11}}>
-                        At least 8 characters
+                At least 8 characters
             </Text>
           </View>
         }
@@ -41,7 +41,7 @@ export default (
               {'\u25CF '}
             </Text>
             <Text style={{ fontSize: 11}}>
-                        At least 1 uppercase letter
+                At least 1 uppercase letter
             </Text>
           </View>
         }
@@ -51,7 +51,7 @@ export default (
               {'\u25CF '}
             </Text>
             <Text style={{ fontSize: 11}}>
-                        At least 1 number
+                At least 1 number
             </Text>
           </View>
         }
@@ -61,7 +61,7 @@ export default (
               {'\u25CF '}
             </Text>
             <Text style={{ fontSize: 11}}>
-                        At least 1 special character
+                At least 1 special character
             </Text>
           </View>
         }

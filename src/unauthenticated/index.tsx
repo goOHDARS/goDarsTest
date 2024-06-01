@@ -5,7 +5,7 @@ import AdditionalInfoScreen from './AdditionalInfoScreen'
 import SignInScreen from './SignInScreen'
 import { useAppSelector } from '@hooks/store'
 import { useEffect } from 'react'
-import Onboarding from './Onboarding'
+import Onboarding from '../authenticated/Onboarding'
 import { CourseBrief } from 'src/reducers/courses'
 
 export type RootUnauthenticatedStackParamList = {

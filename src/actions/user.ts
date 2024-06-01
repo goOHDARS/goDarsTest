@@ -4,7 +4,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
-  User,
 } from 'firebase/auth'
 import { auth } from '@configs/firebase'
 import { AppDispatch } from '../store'
