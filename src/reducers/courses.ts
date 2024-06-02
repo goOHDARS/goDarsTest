@@ -9,7 +9,7 @@ export type CourseBrief = {
   shortName: string
   credits: number
   semester: number
-  category: string
+  category?: string
   subcategory?: string
 }
 
@@ -37,10 +37,10 @@ export type UserCourse = {
 type CoursesState = BaseState & {
   selectedCourse?: Course
   courses?: CourseBrief[]
+  queryResults?: CourseBrief[]
 }
 
 const initialState: CoursesState = {
-  courses: [],
   loading: false,
 }
 
@@ -51,6 +51,7 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
     case courses.ADD_COURSE_REQUEST:
     case courses.REMOVE_COURSE_REQUEST:
     case courses.GET_INFO_REQUEST:
+    case courses.QUERY_COURSES_REQUEST:
       return {
         ...state,
         loading: true,
@@ -76,7 +77,7 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
         courses: state.courses?.filter(
           (course) =>
             course.shortName !==
-            (action.payload as { courseName: string }).courseName,
+            (action.payload as { courseName: string }).courseName
         ),
         error: undefined,
       }
@@ -93,11 +94,19 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
         loading: false,
         error: undefined,
       }
+    case courses.QUERY_COURSES_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        error: undefined,
+        queryResults: action.payload as CourseBrief[],
+      }
     case courses.GET_COURSES_FAILURE:
     case courses.SET_COURSES_FAILURE:
     case courses.ADD_COURSE_FAILURE:
     case courses.REMOVE_COURSE_FAILURE:
     case courses.GET_INFO_FAILURE:
+    case courses.QUERY_COURSES_FAILURE:
       return {
         ...state,
         loading: false,
