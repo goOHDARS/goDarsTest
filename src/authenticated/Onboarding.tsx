@@ -1,17 +1,13 @@
 import { GET_COURSES_SUCCESS, getInitialCourses, setInitialCourses } from '@actions/courses'
-import { getCurrentUser, SET_USER_SUCCESS } from '@actions/user'
+import { getCurrentUser } from '@actions/user'
 import Button from '@components/Button'
 import ScreenLayout from '@components/ScreenLayout'
 import SelectedCourses from '@components/SelectedCourses'
-import UserYears from '@components/Semester'
 import Snackbar from '@components/Snackbar'
 import {
   useAppDispatch,
   useAppSelector,
 } from '@hooks/store'
-import { original } from '@reduxjs/toolkit'
-import { select } from 'firebase-functions/params'
-import { updateCurrentUser } from 'firebase/auth'
 import {
   useEffect,
   useState } from 'react'

@@ -1,6 +1,9 @@
 import { signOutUser } from '@actions/user'
 import ScreenLayout from '@components/ScreenLayout'
-import { useAppDispatch, useAppSelector } from '@hooks/store'
+import {
+  useAppDispatch,
+  useAppSelector,
+} from '@hooks/store'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { RootAuthenticatedTabBarParamList } from '.'
 import {
@@ -8,12 +11,10 @@ import {
   Text,
   Image,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
 } from 'react-native'
 import React from 'react'
 import UserYears from '@components/Semester'
-import { CourseBrief } from 'src/reducers/courses'
 import Button from '@components/Button'
 
 type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/app'>

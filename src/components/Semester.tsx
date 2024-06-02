@@ -1,8 +1,16 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+} from 'react-native'
 import React, { useEffect } from 'react'
 import Divider from '@components/Divider'
 import { CourseBrief } from 'src/reducers/courses'
-import { useAppDispatch, useAppSelector } from '@hooks/store'
+import {
+  useAppDispatch,
+  useAppSelector,
+} from '@hooks/store'
 import { getCurrentMajor } from '@actions/majors'
 
 /**

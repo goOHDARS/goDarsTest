@@ -46,14 +46,11 @@ export const queryCourses = (search: string) => {
 
 export const getInitialCourses = () => {
   return async (dispatch: AppDispatch) => {
-    console.log('getInitialCourses')
-    console.log(
-      authRequestWithDispatch({
-        dispatch,
-        endpoint: 'get_initial_courses',
-        types: [GET_COURSES_REQUEST, GET_COURSES_SUCCESS, GET_COURSES_FAILURE],
-      })
-    )
+    return authRequestWithDispatch({
+      dispatch,
+      endpoint: 'get_initial_courses',
+      types: [GET_COURSES_REQUEST, GET_COURSES_SUCCESS, GET_COURSES_FAILURE],
+    })
   }
 }
 
