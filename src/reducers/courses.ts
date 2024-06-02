@@ -8,7 +8,7 @@ export type CourseBrief = {
   fullName: string
   shortName: string
   credits: number
-  semester: number
+  semester: number | null
   category?: string
   subcategory?: string
 }
