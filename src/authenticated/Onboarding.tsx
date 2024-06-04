@@ -1,6 +1,5 @@
 import {
-  GET_COURSES_SUCCESS,
-  getInitialCourses,
+  queryCourses,
   setInitialCourses,
 } from '@actions/courses'
 import { getCurrentUser } from '@actions/user'
@@ -12,7 +11,6 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '@hooks/store'
-import { original } from '@reduxjs/toolkit'
 import {
   useEffect,
   useState,
@@ -44,7 +42,7 @@ import {
 export default () => {
   const dispatch = useAppDispatch()
 
-  const courses = useAppSelector((state) => state.courses.courses)
+  const courses = useAppSelector((state) => state.courses.queryResults)
   const major = useAppSelector((state) => state.majors.currentMajor)
   const loading = useAppSelector((state) => state.user.loading)
 
@@ -56,14 +54,8 @@ export default () => {
 
   const [modalVisible, setModalVisible] = useState(false)
 
-  const originalDataSet = courses?.map((course, index) => {
-    return {
-      id: course.id,
-      title: course.shortName,
-    }
-  }) ?? []
-
-  const [dataSet, setDataSet] = useState<TAutocompleteDropdownItem[]>(originalDataSet)
+  const [dataSet, setDataSet] = useState<TAutocompleteDropdownItem[]>([])
+  const [query, setQuery] = useState('')
 
   const handleSelectCourse = (courseParam: TAutocompleteDropdownItem) => {
     if (!courseParam || !courseParam.title) return
@@ -175,15 +167,17 @@ export default () => {
         }))
       }
     }
+  }, [added, selectedCourses])
 
-    if (!courses || courses.length === 0) {
-      dispatch(getInitialCourses())
-    }
-
-    if ((!dataSet || dataSet.length === 0) && courses?.length !== 0) {
-      setDataSet(originalDataSet)
-    }
-  }, [added, courses, selectedCourses])
+  useEffect(() => {
+    dispatch(queryCourses(query))
+    setDataSet(courses?.map((course, index) => {
+      return {
+        id: course.id,
+        title: course.shortName,
+      }
+    }) ?? [])
+  }, [query])
 
   return (
     <ScreenLayout style={{ justifyContent: 'space-between' }}>
@@ -214,6 +208,7 @@ export default () => {
               <Search color={'#ffffff'} strokeWidth={3}></Search>
             </View>
             <AutocompleteDropdown
+              onChangeText={(e) => setQuery(e)}
               containerStyle={styles.textBoxInput}
               textInputProps={{
                 style: styles.dropDownText,
@@ -257,7 +252,7 @@ export default () => {
         indicatorStyle="black"
       >
         <SelectedCourses
-          dataSet={originalDataSet} setDataSet={setDataSet}
+          dataSet={dataSet} setDataSet={setDataSet}
           credits={credits} setCredits={setCredits}
           setSelectedCourses={setSelectedCourses}
           selectedCourses={selectedCourses}></SelectedCourses>
@@ -328,7 +323,7 @@ export default () => {
                       justifyContent: 'space-between', width: '75%', marginBottom: 10}}>
                       <Text style={styles.editCourseTextLeft}>{course.shortName}</Text>
                       <TextInput
-                        value={course.semester?.toString() === '0' ? '' :
+                        value={course?.semester?.toString() === '0' ? '' :
                           course.semester?.toString()}
                         onChangeText={(e) => {
                           handleEditSemester(course, e)

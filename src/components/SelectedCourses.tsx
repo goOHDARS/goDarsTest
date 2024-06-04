@@ -1,10 +1,11 @@
+import { useAppSelector } from '@hooks/store'
 import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
 import { TAutocompleteDropdownItem } from 'react-native-autocomplete-dropdown'
 import { XCircle } from 'react-native-feather'
 import { CourseBrief } from 'src/reducers/courses'
 
 export default (
-  { credits, setCredits, selectedCourses, setSelectedCourses, dataSet, setDataSet }
+  { credits, setCredits, selectedCourses, setSelectedCourses, setDataSet }
   :
   { credits: number, setCredits: React.Dispatch<React.SetStateAction<number>>,
     selectedCourses: CourseBrief[],
@@ -12,17 +13,19 @@ export default (
     dataSet: TAutocompleteDropdownItem[],
     setDataSet: React.Dispatch<React.SetStateAction<TAutocompleteDropdownItem[]>>,
   }) => {
+  const courses = useAppSelector((state) => state.courses.queryResults)
   const handlePressX = (courseParam: CourseBrief) => {
     setSelectedCourses(selectedCourses.filter((courseFilter) =>
       courseFilter.shortName !== courseParam.shortName)),
     setCredits(credits - courseParam.credits)
 
-    setDataSet(selectedCourses.map((course) => {
+    setDataSet(courses?.map((course) => {
       return {
         id: course.id,
         title: course.shortName,
       }
-    }))
+    }).filter((course) => !selectedCourses.some(
+      (selectedCourses) => selectedCourses.shortName === course.title)) ?? [])
   }
   const viewCourses = []
   selectedCourses.length === 0
