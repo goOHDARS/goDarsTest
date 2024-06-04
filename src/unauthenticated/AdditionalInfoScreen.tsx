@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import ScreenLayout from '@components/ScreenLayout'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown'
 import Button from '@components/Button'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -171,6 +171,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           closeOnBlur={true}
           closeOnSubmit={false}
           dataSet={currentMajors}
+          direction={Platform.OS === 'ios' ? 'down' : 'up'}
         />
         <AutocompleteDropdown
           containerStyle={styles.dropDown}

@@ -1,14 +1,29 @@
 import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
+import { TAutocompleteDropdownItem } from 'react-native-autocomplete-dropdown'
 import { XCircle } from 'react-native-feather'
 import { CourseBrief } from 'src/reducers/courses'
 
 export default (
-  { credits, setCredits, selectedCourses, setSelectedCourses }
+  { credits, setCredits, selectedCourses, setSelectedCourses, dataSet, setDataSet }
   :
   { credits: number, setCredits: React.Dispatch<React.SetStateAction<number>>,
     selectedCourses: CourseBrief[],
-    setSelectedCourses: React.Dispatch<React.SetStateAction<CourseBrief[]>>
+    setSelectedCourses: React.Dispatch<React.SetStateAction<CourseBrief[]>>,
+    dataSet: TAutocompleteDropdownItem[],
+    setDataSet: React.Dispatch<React.SetStateAction<TAutocompleteDropdownItem[]>>,
   }) => {
+  const handlePressX = (courseParam: CourseBrief) => {
+    setSelectedCourses(selectedCourses.filter((courseFilter) =>
+      courseFilter.shortName !== courseParam.shortName)),
+    setCredits(credits - courseParam.credits)
+
+    setDataSet(selectedCourses.map((course) => {
+      return {
+        id: course.id,
+        title: course.shortName,
+      }
+    }))
+  }
   const viewCourses = []
   selectedCourses.length === 0
     ? viewCourses.push(
@@ -26,11 +41,7 @@ export default (
               <Text style={styles.selectedCourseExtraText}>
                 {course.credits}
               </Text>
-              <TouchableOpacity onPress={() => {
-                setSelectedCourses(selectedCourses.filter((courseFilter) =>
-                  courseFilter.shortName !== course.shortName)),
-                setCredits(credits - course.credits)
-              }}>
+              <TouchableOpacity onPress={() => handlePressX(course)}>
                 <XCircle color={'black'} width={20}></XCircle>
               </TouchableOpacity>
             </View>

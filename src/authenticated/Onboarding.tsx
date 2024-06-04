@@ -12,6 +12,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '@hooks/store'
+import { original } from '@reduxjs/toolkit'
 import {
   useEffect,
   useState,
@@ -255,7 +256,9 @@ export default () => {
         showsVerticalScrollIndicator={true}
         indicatorStyle="black"
       >
-        <SelectedCourses credits={credits} setCredits={setCredits}
+        <SelectedCourses
+          dataSet={originalDataSet} setDataSet={setDataSet}
+          credits={credits} setCredits={setCredits}
           setSelectedCourses={setSelectedCourses}
           selectedCourses={selectedCourses}></SelectedCourses>
       </ScrollView>
