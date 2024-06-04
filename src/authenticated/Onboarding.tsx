@@ -62,9 +62,6 @@ export default () => {
     }
   }) ?? []
 
-  console.log('originalDataSet: ')
-  console.log(Array.isArray(courses))
-
   const [dataSet, setDataSet] = useState<TAutocompleteDropdownItem[]>(originalDataSet)
 
   const handleSelectCourse = (courseParam: TAutocompleteDropdownItem) => {
@@ -123,7 +120,6 @@ export default () => {
     ])
   }
   const handleFinalFinishAccount = async () => {
-    console.log('got here')
     const omitArr: Omit<UserCourse, 'id'>[] = selectedCourses.map((course) => {
       return {
         course: course.shortName,
