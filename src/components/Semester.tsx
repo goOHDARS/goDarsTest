@@ -29,7 +29,6 @@ const UserYears = () => {
   years.set(3, 'Junior')
   years.set(4, 'Senior')
 
-  const user = useAppSelector((state) => state.user?.user)
   const userCourses = useAppSelector((state) => state.courses.courses)
   const major = useAppSelector((state) => state.majors.currentMajor)
   const dispatch = useAppDispatch()
@@ -75,7 +74,7 @@ const UserYears = () => {
   for (let i = 0; i < viewSemesters.length; i++) {
     if (i % 2 === 0) {
       viewYears.push(
-        <View style={{ flexDirection: 'column', overflow: 'scroll' }}>
+        <View key={i} style={{ flexDirection: 'column', overflow: 'scroll' }}>
           <Text style={styles.title}>
             {years.has(i / 2 + 1)
               ? years.get(i / 2 + 1)
@@ -97,8 +96,6 @@ const UserYears = () => {
 
   return viewYears
 }
-
-export default UserYears
 
 const styles = StyleSheet.create({
   title: {
@@ -173,3 +170,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 })
+
+export default UserYears

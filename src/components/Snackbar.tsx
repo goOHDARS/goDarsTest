@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native'
 
 const Snackbar = ({
   message = '',
@@ -10,6 +10,7 @@ const Snackbar = ({
   },
 }) => {
   return visible ? (
+
     <View style={styles.container}>
       <Text style={styles.messageText}>{message}</Text>
       {actionText && (
@@ -19,7 +20,7 @@ const Snackbar = ({
       )}
     </View>
   ) : (
-    <View style={{ height: 60 }}></View>
+    <View style={{ height: 50 }}></View>
   )
 }
 
@@ -33,8 +34,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 15,
-    height: 60,
-    width: '90%',
+    height: 50,
+    width: '95%',
   },
   messageText: {
     fontSize: 16,

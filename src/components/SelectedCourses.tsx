@@ -1,23 +1,39 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
+import { XCircle } from 'react-native-feather'
 import { CourseBrief } from 'src/reducers/courses'
 
-export default ({ selectedCourses }: { selectedCourses: CourseBrief[] }) => {
+export default (
+  { credits, setCredits, selectedCourses, setSelectedCourses }
+  :
+  { credits: number, setCredits: React.Dispatch<React.SetStateAction<number>>,
+    selectedCourses: CourseBrief[],
+    setSelectedCourses: React.Dispatch<React.SetStateAction<CourseBrief[]>>
+  }) => {
   const viewCourses = []
   selectedCourses.length === 0
     ? viewCourses.push(
-      <Text>Add a course to your clipboard to get started.</Text>,
+      <Text key={Math.random()}>Add a course to your clipboard to get started.</Text>,
     )
     : viewCourses.push(
       selectedCourses?.map((course, index) => {
         // removing pressable here breaks the ScrollView on the Onboarding screen
         return (
-          <Pressable key={course.id} style={styles.selectedCourse}>
+          <Pressable key={index} style={styles.selectedCourse}>
             <Text style={styles.selectedCourseNameText}>
               {course.shortName}
             </Text>
-            <Text style={styles.selectedCourseExtraText}>
-              {course.credits}
-            </Text>
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+              <Text style={styles.selectedCourseExtraText}>
+                {course.credits}
+              </Text>
+              <TouchableOpacity onPress={() => {
+                setSelectedCourses(selectedCourses.filter((courseFilter) =>
+                  courseFilter.shortName !== course.shortName)),
+                setCredits(credits - course.credits)
+              }}>
+                <XCircle color={'black'} width={20}></XCircle>
+              </TouchableOpacity>
+            </View>
           </Pressable>
         )
       }),

@@ -42,6 +42,7 @@ type CoursesState = BaseState & {
 
 const initialState: CoursesState = {
   loading: false,
+  error: undefined,
 }
 
 export default (state = initialState, action: UnknownAction): CoursesState => {

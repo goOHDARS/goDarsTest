@@ -1,4 +1,8 @@
-import { GET_COURSES_SUCCESS, getInitialCourses, setInitialCourses } from '@actions/courses'
+import {
+  GET_COURSES_SUCCESS,
+  getInitialCourses,
+  setInitialCourses,
+} from '@actions/courses'
 import { getCurrentUser } from '@actions/user'
 import Button from '@components/Button'
 import ScreenLayout from '@components/ScreenLayout'
@@ -10,40 +14,56 @@ import {
 } from '@hooks/store'
 import {
   useEffect,
-  useState } from 'react'
+  useState,
+} from 'react'
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   Platform,
+  Alert,
+  Modal,
+  TextInput,
 } from 'react-native'
 import {
   AutocompleteDropdown,
   TAutocompleteDropdownItem,
 } from 'react-native-autocomplete-dropdown'
-import { Search } from 'react-native-feather'
-import { CourseBrief, UserCourse } from 'src/reducers/courses'
+import {
+  HelpCircle,
+  Info,
+  Search,
+} from 'react-native-feather'
+import {
+  CourseBrief,
+  UserCourse,
+} from 'src/reducers/courses'
 
 export default () => {
   const dispatch = useAppDispatch()
 
-  const user = useAppSelector((state) => state.user?.user)
   const courses = useAppSelector((state) => state.courses.courses)
   const major = useAppSelector((state) => state.majors.currentMajor)
+  const loading = useAppSelector((state) => state.user.loading)
 
   const [added, setAdded] = useState<CourseBrief>()
   const [isVisible, setIsVisible] = useState(false)
 
   const [credits, setCredits] = useState(0.0)
   const [selectedCourses, setSelectedCourses] = useState<CourseBrief[]>([])
-  const originalDataSet = courses !== undefined && Array.isArray(courses) ?
-    courses.map((course, index) => {
-      return {
-        id: course.id,
-        title: course.shortName,
-      }
-    }) : []
+
+  const [modalVisible, setModalVisible] = useState(false)
+
+  const originalDataSet = courses?.map((course, index) => {
+    return {
+      id: course.id,
+      title: course.shortName,
+    }
+  }) ?? []
+
+  console.log('originalDataSet: ')
+  console.log(Array.isArray(courses))
 
   const [dataSet, setDataSet] = useState<TAutocompleteDropdownItem[]>(originalDataSet)
 
@@ -70,7 +90,7 @@ export default () => {
       setSelectedCourses(
         selectedCourses.filter(
           (course) => course.shortName !== selectedCourse.shortName,
-        ),
+        )
       )
     }
   }
@@ -80,35 +100,57 @@ export default () => {
       setSelectedCourses(
         selectedCourses?.filter(
           (course) => course.shortName !== courseParam.shortName,
-        ),
+        ).sort()
       )
       setCredits(credits - courseParam?.credits)
     }
   }
 
-  const handleContinuePress = async () => {
+  const handleContinuePress = () => {
+    Alert.alert('goOHDARS', 'Please confirm your edits to your courses. ' +
+    'This may impact future suggestions by goOHDARS.', [
+      {
+        text: 'Cancel',
+        style: 'destructive',
+      },
+      {
+        text: 'Confirm',
+        onPress: () => {
+          handleFinalFinishAccount()
+        },
+        style: 'default',
+      },
+    ])
+  }
+  const handleFinalFinishAccount = async () => {
+    console.log('got here')
     const omitArr: Omit<UserCourse, 'id'>[] = selectedCourses.map((course) => {
       return {
         course: course.shortName,
-        semester: course.semester,
-        category: course.category,
+        semester: course.semester ?? 0,
+        category: course.category ?? '',
         subcategory: course.subcategory,
       }
     })
+    // There were some promise resolution issues with the following two lines
     await dispatch(setInitialCourses(omitArr))
-    dispatch(getCurrentUser())
-    dispatch({
-      type: GET_COURSES_SUCCESS,
-      payload: {
-        courses: selectedCourses,
-      },
-    })
+    await dispatch(getCurrentUser())
+  }
+  const handleEditSemester = (changedCourse: CourseBrief, newSemester: string) => {
+    if (+newSemester > 0 || newSemester === '') {
+      const updatedCourses = selectedCourses.map((course) => {
+        if (course.shortName === changedCourse.shortName) {
+          return { ...course, semester: +newSemester } // Create a new object with updated semester
+        }
+        return course
+      })
+
+      setSelectedCourses(updatedCourses)
+    }
   }
 
-  const handleClearPress = () => {
-    setSelectedCourses([])
-    setDataSet(originalDataSet)
-    setCredits(0.0)
+  const handleEditSemesters = () => {
+    setModalVisible(true)
   }
 
   useEffect(() => {
@@ -122,9 +164,6 @@ export default () => {
   }, [isVisible])
 
   useEffect(() => {
-    console.log('\n\nCOURSESFILTER: ')
-    console.log(courses)
-    console.log('\n\n')
     if (added && courses) {
       const except = courses?.filter((course) => !selectedCourses.some(
         (selectedCourses) => selectedCourses.shortName === course.shortName))
@@ -157,7 +196,7 @@ export default () => {
           flexDirection: 'column',
           width: '100%',
           alignItems: 'center',
-          gap: 20,
+          gap: 15,
         }}
       >
         <Snackbar
@@ -209,6 +248,7 @@ export default () => {
             />
           </View>
         </View>
+        <Text style={{ fontSize: 11}}>Please add all courses with their respective semester.</Text>
         <View style={styles.clipboardContainer}>
           <Text style={styles.clipboard}>Clipboard</Text>
           <View style={styles.divider}></View>
@@ -219,7 +259,9 @@ export default () => {
         showsVerticalScrollIndicator={true}
         indicatorStyle="black"
       >
-        <SelectedCourses selectedCourses={selectedCourses}></SelectedCourses>
+        <SelectedCourses credits={credits} setCredits={setCredits}
+          setSelectedCourses={setSelectedCourses}
+          selectedCourses={selectedCourses}></SelectedCourses>
       </ScrollView>
       <View style={{ display: 'flex', flexDirection: 'row',
         width: '75%', justifyContent: 'space-between'}}>
@@ -244,23 +286,85 @@ export default () => {
           justifyContent: 'flex-end',
           width: '90%',
           marginBottom: 30,
+          marginTop: 10,
           gap: 10,
         }}
       >
         <Button
           disabled={selectedCourses.length === 0}
           fullWidth
-          onPress={handleClearPress}
+          onPress={handleEditSemesters}
         >
-          Clear
+          Edit Semesters
         </Button>
-        <Button
-          disabled={selectedCourses.length === 0}
-          fullWidth
-          onPress={handleContinuePress}
-        >
-          Finish Account
-        </Button>
+        <Modal animationType='slide' visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)} presentationStyle='pageSheet'>
+          <ScreenLayout>
+            <View style=
+              {{display: 'flex', width: '100%', height: '90%'}}>
+              <View
+                style={{ display: 'flex', marginVertical: '10%', alignItems: 'center'}}>
+                <Text
+                  style={{ fontSize: 28, color: '#039942', fontWeight: '900' }}>
+                  Adjust your semesters
+                </Text>
+                <View
+                  style={{ display: 'flex', flexDirection: 'row',
+                    gap: 10, width: '90%', marginVertical: '5%'}}>
+                  <Info color={'black'} width={15}></Info>
+                  <Text style={{ fontSize: 11 }}>
+                    {'Below are suggested semesters for these courses,' +
+                    ' edit the semester if the course was taken at a different time'}
+                  </Text>
+                </View>
+                <View style={{ display: 'flex', flexDirection: 'row',
+                  marginBottom: '2.5%', marginTop: '2.5%'}}>
+                  <Text style={styles.editCourseTextLeft}>Course Name</Text>
+                  <Text style={styles.editCourseText}>Semester</Text>
+                  <Text style={styles.editCourseTextRight}>Credits</Text>
+                </View>
+                {selectedCourses.map((course, index) => {
+                  return (
+                    <View key={index} style={{ display: 'flex', flexDirection: 'row',
+                      justifyContent: 'space-between', width: '75%', marginBottom: 10}}>
+                      <Text style={styles.editCourseTextLeft}>{course.shortName}</Text>
+                      <TextInput
+                        value={course.semester?.toString() === '0' ? '' :
+                          course.semester?.toString()}
+                        onChangeText={(e) => {
+                          handleEditSemester(course, e)
+                        }}
+                        placeholder='edit me'
+                        style={styles.editCourseText}
+                        inputMode='decimal'
+                      />
+                      <Text style={styles.editCourseTextRight}>{course.credits}</Text>
+                    </View>
+                  )
+                })}
+              </View>
+            </View>
+            <View style={{ display: 'flex', width: '90%', height: '10%',
+              alignContent: 'flex-end', justifyContent: 'center', gap: 5}}>
+              <View style={{ display: 'flex', flexDirection: 'row',
+                alignItems: 'center', justifyContent: 'center'}}>
+                <HelpCircle strokeWidth={3}></HelpCircle>
+                <Text style={{ fontSize: 12, marginLeft: 5}}>
+                  This allows goOHDARS to plan future schedules
+                </Text>
+              </View>
+              <Button
+                disabled={selectedCourses.filter((course) =>
+                  course.semester?.toString() === '' || course.semester === 0).length > 0}
+                fullWidth
+                onPress={handleContinuePress}
+                loading={loading}
+              >
+                  Finish Account
+              </Button>
+            </View>
+          </ScreenLayout>
+        </Modal>
       </View>
     </ScreenLayout>
   )
@@ -339,5 +443,26 @@ const styles = StyleSheet.create({
     borderBottomColor: 'black',
     borderBottomWidth: StyleSheet.hairlineWidth,
     marginBottom: 10,
+  },
+  editCourseText: {
+    display: 'flex',
+    flexDirection: 'row',
+    fontSize: 12,
+    width: '25%',
+    textAlign: 'center',
+  },
+  editCourseTextLeft: {
+    display: 'flex',
+    flexDirection: 'row',
+    fontSize: 12,
+    width: '25%',
+    textAlign: 'left',
+  },
+  editCourseTextRight: {
+    display: 'flex',
+    flexDirection: 'row',
+    fontSize: 12,
+    width: '25%',
+    textAlign: 'right',
   },
 })
