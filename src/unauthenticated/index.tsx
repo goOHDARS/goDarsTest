@@ -24,8 +24,6 @@ type Props = {
 
 const UnauthenticatedRoot = ({ firstTimeUser }: Props) => {
   const initialRouteName = firstTimeUser ? '/landing' : '/signin'
-  const onboarded = useAppSelector((state) => state.user?.user?.onboarded)
-  const isOnboarded = onboarded ? '/signin' : '/onboarding'
 
   return (
     <UnauthenticatedStack.Navigator

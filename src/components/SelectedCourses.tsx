@@ -1,22 +1,21 @@
-import { useAppSelector } from '@hooks/store'
 import { View, Text, StyleSheet, Pressable, TouchableOpacity } from 'react-native'
 import { TAutocompleteDropdownItem } from 'react-native-autocomplete-dropdown'
 import { XCircle } from 'react-native-feather'
 import { CourseBrief } from 'src/reducers/courses'
 
 export default (
-  { credits, setCredits, selectedCourses, setSelectedCourses, setDataSet }
+  { credits, setCredits, selectedCourses, setSelectedCourses, setDataSet, courses }
   :
   { credits: number, setCredits: React.Dispatch<React.SetStateAction<number>>,
     selectedCourses: CourseBrief[],
     setSelectedCourses: React.Dispatch<React.SetStateAction<CourseBrief[]>>,
     dataSet: TAutocompleteDropdownItem[],
     setDataSet: React.Dispatch<React.SetStateAction<TAutocompleteDropdownItem[]>>,
+    courses: CourseBrief[]
   }) => {
-  const courses = useAppSelector((state) => state.courses.queryResults)
   const handlePressX = (courseParam: CourseBrief) => {
     setSelectedCourses(selectedCourses.filter((courseFilter) =>
-      courseFilter.shortName !== courseParam.shortName)),
+      courseFilter.shortName !== courseParam.shortName))
     setCredits(credits - courseParam.credits)
 
     setDataSet(courses?.map((course) => {
@@ -28,30 +27,27 @@ export default (
       (selectedCourses) => selectedCourses.shortName === course.title)) ?? [])
   }
   const viewCourses = []
-  selectedCourses.length === 0
-    ? viewCourses.push(
-      <Text key={Math.random()}>Add a course to your clipboard to get started.</Text>,
-    )
-    : viewCourses.push(
-      selectedCourses?.map((course, index) => {
-        // removing pressable here breaks the ScrollView on the Onboarding screen
-        return (
-          <Pressable key={index} style={styles.selectedCourse}>
-            <Text style={styles.selectedCourseNameText}>
-              {course.shortName}
+
+  viewCourses.push(
+    selectedCourses?.map((course, index) => {
+      // removing pressable here breaks the ScrollView on the Onboarding screen
+      return (
+        <Pressable key={index} style={styles.selectedCourse}>
+          <Text style={styles.selectedCourseNameText}>
+            {course.shortName}
+          </Text>
+          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+            <Text style={styles.selectedCourseExtraText}>
+              {course.credits}
             </Text>
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-              <Text style={styles.selectedCourseExtraText}>
-                {course.credits}
-              </Text>
-              <TouchableOpacity onPress={() => handlePressX(course)}>
-                <XCircle color={'black'} width={20}></XCircle>
-              </TouchableOpacity>
-            </View>
-          </Pressable>
-        )
-      }),
-    )
+            <TouchableOpacity onPress={() => handlePressX(course)}>
+              <XCircle color={'black'} width={20}></XCircle>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      )
+    })
+  )
 
   return viewCourses
 }
@@ -62,6 +58,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '75%',
+    marginHorizontal: 10,
   },
   selectedCourseNameText: {
     fontSize: 14,

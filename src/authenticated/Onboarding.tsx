@@ -1,4 +1,6 @@
 import {
+  GET_COURSES_SUCCESS,
+  getInitialCourses,
   queryCourses,
   setInitialCourses,
 } from '@actions/courses'
@@ -11,6 +13,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from '@hooks/store'
+import { initializeApp } from 'firebase-admin'
 import {
   useEffect,
   useState,
@@ -24,6 +27,7 @@ import {
   Alert,
   Modal,
   TextInput,
+  Pressable,
 } from 'react-native'
 import {
   AutocompleteDropdown,
@@ -42,6 +46,8 @@ import {
 export default () => {
   const dispatch = useAppDispatch()
 
+  const initialCourses = useAppSelector((state) => state.courses.courses)
+  const user = useAppSelector((state) => state.user.user)
   const courses = useAppSelector((state) => state.courses.queryResults)
   const major = useAppSelector((state) => state.majors.currentMajor)
   const loading = useAppSelector((state) => state.user.loading)
@@ -56,6 +62,8 @@ export default () => {
 
   const [dataSet, setDataSet] = useState<TAutocompleteDropdownItem[]>([])
   const [query, setQuery] = useState('')
+
+  const [initialized, setInitialized] = useState(false)
 
   const handleSelectCourse = (courseParam: TAutocompleteDropdownItem) => {
     if (!courseParam || !courseParam.title) return
@@ -124,17 +132,36 @@ export default () => {
     // There were some promise resolution issues with the following two lines
     await dispatch(setInitialCourses(omitArr))
     await dispatch(getCurrentUser())
+    dispatch({
+      type: GET_COURSES_SUCCESS,
+      payload: selectedCourses,
+    })
   }
   const handleEditSemester = (changedCourse: CourseBrief, newSemester: string) => {
     if (+newSemester > 0 || newSemester === '') {
-      const updatedCourses = selectedCourses.map((course) => {
-        if (course.shortName === changedCourse.shortName) {
-          return { ...course, semester: +newSemester } // Create a new object with updated semester
-        }
-        return course
-      })
-
-      setSelectedCourses(updatedCourses)
+      if (user?.semester && user?.semester >= +newSemester) {
+        const updatedCourses = selectedCourses.map((course) => {
+          if (course.shortName === changedCourse.shortName) {
+            return { ...course, semester: +newSemester }
+          }
+          return course
+        })
+        setSelectedCourses(updatedCourses)
+      } else {
+        Alert.alert('goOHDARS', 'Cannot set semester higher than current semester.', [
+          {
+            text: 'Cancel',
+            style: 'destructive',
+          },
+        ])
+        const updatedCourses = selectedCourses.map((course) => {
+          if (course.shortName === changedCourse.shortName) {
+            return { ...course, semester: 0 } // Create a new object with updated semester
+          }
+          return course
+        })
+        setSelectedCourses(updatedCourses)
+      }
     }
   }
 
@@ -167,17 +194,37 @@ export default () => {
         }))
       }
     }
-  }, [added, selectedCourses])
+  }, [added])
 
   useEffect(() => {
-    dispatch(queryCourses(query))
-    setDataSet(courses?.map((course, index) => {
-      return {
-        id: course.id,
-        title: course.shortName,
+    if (!courses || courses.length === 0) {
+      dispatch(queryCourses(query))
+    } else if (courses) {
+      const except = courses?.filter((course) => !selectedCourses.some(
+        (selectedCourses) => selectedCourses.shortName === course.shortName))
+
+      if (except) {
+        setDataSet(except?.map((course, index) => {
+          return {
+            key: index,
+            id: course.id,
+            title: course.shortName,
+          }
+        }))
       }
-    }) ?? [])
-  }, [query])
+    }
+  }, [query, courses])
+
+  useEffect(() => {
+    if (initialCourses === null || initialCourses === undefined
+      || initialCourses.length === 0 || !Array.isArray(initialCourses)) {
+      dispatch(getInitialCourses())
+    } else if (initialCourses && !initialized) {
+      setSelectedCourses(initialCourses)
+      setCredits(initialCourses.reduce((acc, course) => acc + course.credits, 0))
+      setInitialized(true)
+    }
+  })
 
   return (
     <ScreenLayout style={{ justifyContent: 'space-between' }}>
@@ -252,13 +299,16 @@ export default () => {
         indicatorStyle="black"
       >
         <SelectedCourses
+          courses={courses ?? []}
           dataSet={dataSet} setDataSet={setDataSet}
           credits={credits} setCredits={setCredits}
           setSelectedCourses={setSelectedCourses}
-          selectedCourses={selectedCourses}></SelectedCourses>
+          selectedCourses={selectedCourses}>
+        </SelectedCourses>
       </ScrollView>
       <View style={{ display: 'flex', flexDirection: 'row',
-        width: '75%', justifyContent: 'space-between'}}>
+        width: '75%', justifyContent: 'space-between',
+        marginTop: 10}}>
         <Text style={{ fontWeight: '700' }}>
           {credits === 0 ? '' : 'Selected Credits '}
         </Text>
@@ -295,7 +345,7 @@ export default () => {
           onRequestClose={() => setModalVisible(false)} presentationStyle='pageSheet'>
           <ScreenLayout>
             <View style=
-              {{display: 'flex', width: '100%', height: '90%'}}>
+              {{display: 'flex', width: '100%', height: '90%', alignItems: 'center'}}>
               <View
                 style={{ display: 'flex', marginVertical: '10%', alignItems: 'center'}}>
                 <Text
@@ -311,16 +361,18 @@ export default () => {
                     ' edit the semester if the course was taken at a different time'}
                   </Text>
                 </View>
-                <View style={{ display: 'flex', flexDirection: 'row',
-                  marginBottom: '2.5%', marginTop: '2.5%'}}>
-                  <Text style={styles.editCourseTextLeft}>Course Name</Text>
-                  <Text style={styles.editCourseText}>Semester</Text>
-                  <Text style={styles.editCourseTextRight}>Credits</Text>
-                </View>
+              </View>
+              <View style={{ display: 'flex', flexDirection: 'row',
+                marginBottom: '2.5%', marginTop: '2.5%'}}>
+                <Text style={styles.editCourseTextLeft}>Course Name</Text>
+                <Text style={styles.editCourseText}>Semester</Text>
+                <Text style={styles.editCourseTextRight}>Credits</Text>
+              </View>
+              <ScrollView>
                 {selectedCourses.map((course, index) => {
                   return (
-                    <View key={index} style={{ display: 'flex', flexDirection: 'row',
-                      justifyContent: 'space-between', width: '75%', marginBottom: 10}}>
+                    <Pressable style={{ display: 'flex', flexDirection: 'row',
+                      justifyContent: 'space-between', marginBottom: 10}} key={index}>
                       <Text style={styles.editCourseTextLeft}>{course.shortName}</Text>
                       <TextInput
                         value={course?.semester?.toString() === '0' ? '' :
@@ -333,10 +385,10 @@ export default () => {
                         inputMode='decimal'
                       />
                       <Text style={styles.editCourseTextRight}>{course.credits}</Text>
-                    </View>
+                    </Pressable>
                   )
                 })}
-              </View>
+              </ScrollView>
             </View>
             <View style={{ display: 'flex', width: '90%', height: '10%',
               alignContent: 'flex-end', justifyContent: 'center', gap: 5}}>
