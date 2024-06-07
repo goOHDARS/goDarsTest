@@ -3,7 +3,6 @@ import UnauthenticatedRoot from './unauthenticated'
 import AuthenticatedRoot from './authenticated'
 import { useAppSelector } from '@hooks/store'
 import FullScreenLoader from '@components/FullScreenLoader'
-import Onboarding from './authenticated/Onboarding'
 
 const Root = () => {
   const user = useAppSelector((state) => state.user.user)
@@ -14,11 +13,7 @@ const Root = () => {
     <>
       {loaded ? (
         user ? (
-          user?.onboarded ? (
-            <AuthenticatedRoot />
-          ) : (
-            <Onboarding />
-          )
+          <AuthenticatedRoot />
         ) : (
           <UnauthenticatedRoot firstTimeUser={firstTimeUser} />
         )

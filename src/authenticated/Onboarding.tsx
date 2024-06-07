@@ -9,11 +9,11 @@ import Button from '@components/Button'
 import ScreenLayout from '@components/ScreenLayout'
 import SelectedCourses from '@components/SelectedCourses'
 import Snackbar from '@components/Snackbar'
+import lodash from 'lodash'
 import {
   useAppDispatch,
   useAppSelector,
 } from '@hooks/store'
-import { initializeApp } from 'firebase-admin'
 import {
   useEffect,
   useState,
@@ -198,7 +198,9 @@ export default () => {
 
   useEffect(() => {
     if (!courses || courses.length === 0) {
-      dispatch(queryCourses(query))
+      lodash.debounce(() =>
+        dispatch(queryCourses(query))
+      , 600)
     } else if (courses) {
       const except = courses?.filter((course) => !selectedCourses.some(
         (selectedCourses) => selectedCourses.shortName === course.shortName))
@@ -445,7 +447,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    width: '95%',
+    width: '90%',
     borderWidth: 1,
     borderColor: '#039942',
     borderRadius: 10,
