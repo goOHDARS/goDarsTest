@@ -9,7 +9,6 @@ import Button from '@components/Button'
 import ScreenLayout from '@components/ScreenLayout'
 import SelectedCourses from '@components/SelectedCourses'
 import Snackbar from '@components/Snackbar'
-import lodash from 'lodash'
 import {
   useAppDispatch,
   useAppSelector,
@@ -42,6 +41,7 @@ import {
   CourseBrief,
   UserCourse,
 } from 'src/reducers/courses'
+import _, { debounce } from 'lodash'
 
 export default () => {
   const dispatch = useAppDispatch()
@@ -101,6 +101,17 @@ export default () => {
         ).sort()
       )
       setCredits(credits - courseParam?.credits)
+    }
+  }
+
+  const debouncedQuery = _.debounce((query: string) => {
+    dispatch(queryCourses(query))
+  }, 600)
+
+  const handleSetQuery = (e: string) => {
+    setQuery(e)
+    if (query.length > 3) {
+      debouncedQuery(query)
     }
   }
 
@@ -198,9 +209,8 @@ export default () => {
 
   useEffect(() => {
     if (!courses || courses.length === 0) {
-      lodash.debounce(() =>
-        dispatch(queryCourses(query))
-      , 600)
+      console.log('querying course')
+      dispatch(queryCourses(query))
     } else if (courses) {
       const except = courses?.filter((course) => !selectedCourses.some(
         (selectedCourses) => selectedCourses.shortName === course.shortName))
@@ -257,7 +267,7 @@ export default () => {
               <Search color={'#ffffff'} strokeWidth={3}></Search>
             </View>
             <AutocompleteDropdown
-              onChangeText={(e) => setQuery(e)}
+              onChangeText={(e) => handleSetQuery(e)}
               containerStyle={styles.textBoxInput}
               textInputProps={{
                 style: styles.dropDownText,
@@ -277,7 +287,7 @@ export default () => {
               closeOnSubmit={false}
               dataSet={dataSet}
               direction={Platform.select({ ios: 'down' })}
-              emptyResultText="No course found with that name."
+              emptyResultText="No course found with that name or course already in list."
               suggestionsListContainerStyle={{
                 height: 275,
                 width: '110%',
@@ -294,6 +304,12 @@ export default () => {
           <Text style={styles.clipboard}>Clipboard</Text>
           <View style={styles.divider}></View>
         </View>
+      </View>
+      <View style={{ display: 'flex', flexDirection: 'row',
+        marginBottom: '2.5%', marginTop: '2.5%', justifyContent: 'space-between', width: '75%'}}>
+        <Text style={styles.editCourseTextLeft}>Course Name</Text>
+        <Text style={styles.editCourseText}>Semester</Text>
+        <Text style={styles.editCourseText}>Credits</Text>
       </View>
       <ScrollView
         contentContainerStyle={{ gap: 5, width: '100%' }}
@@ -365,12 +381,13 @@ export default () => {
                 </View>
               </View>
               <View style={{ display: 'flex', flexDirection: 'row',
-                marginBottom: '2.5%', marginTop: '2.5%'}}>
+                marginBottom: '2.5%', marginTop: '2.5%', width: '75%',
+                justifyContent: 'space-between'}}>
                 <Text style={styles.editCourseTextLeft}>Course Name</Text>
                 <Text style={styles.editCourseText}>Semester</Text>
                 <Text style={styles.editCourseTextRight}>Credits</Text>
               </View>
-              <ScrollView>
+              <ScrollView style={{width: '75%'}}>
                 {selectedCourses.map((course, index) => {
                   return (
                     <Pressable style={{ display: 'flex', flexDirection: 'row',
@@ -493,24 +510,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   editCourseText: {
-    display: 'flex',
-    flexDirection: 'row',
     fontSize: 12,
-    width: '25%',
+    width: '30%',
     textAlign: 'center',
   },
   editCourseTextLeft: {
-    display: 'flex',
-    flexDirection: 'row',
     fontSize: 12,
-    width: '25%',
+    width: '30%',
     textAlign: 'left',
   },
   editCourseTextRight: {
-    display: 'flex',
-    flexDirection: 'row',
     fontSize: 12,
-    width: '25%',
+    width: '30%',
     textAlign: 'right',
   },
 })

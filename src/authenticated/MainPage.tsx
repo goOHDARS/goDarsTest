@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     display: 'flex',
     width: '100%',
-    backgroundColor: 'red',
   },
   userImage: {
     display: 'flex',

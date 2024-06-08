@@ -33,18 +33,29 @@ export default (
       // removing pressable here breaks the ScrollView on the Onboarding screen
       return (
         <Pressable key={index} style={styles.selectedCourse}>
-          <Text style={styles.selectedCourseNameText}>
+          <Text style={styles.editCourseTextLeft}>
             {course.shortName}
           </Text>
-          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+          <Text style={styles.editCourseText}>
+            {course.semester}
+          </Text>
+          <View style={{ width: '30%', display: 'flex', flexDirection: 'row',
+            alignItems: 'center', justifyContent: 'flex-end', gap: 10 }}>
             <Text style={styles.selectedCourseExtraText}>
               {course.credits}
             </Text>
-            <TouchableOpacity onPress={() => handlePressX(course)}>
+            <TouchableOpacity style={{marginRight: 10}} onPress={() => handlePressX(course)}>
               <XCircle color={'black'} width={20}></XCircle>
             </TouchableOpacity>
           </View>
         </Pressable>
+        // <View style={{ display: 'flex', flexDirection: 'row',
+        //   marginBottom: '2.5%', marginTop: '2.5%',
+        //   justifyContent: 'space-between', width: '75%'}}>
+        //   <Text style={styles.editCourseTextLeft}>Course Name</Text>
+        //   <Text style={styles.editCourseText}>Semester</Text>
+        //   <Text style={styles.editCourseTextRight}>Credits</Text>
+        // </View>
       )
     })
   )
@@ -58,15 +69,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '75%',
-    marginHorizontal: 10,
-  },
-  selectedCourseNameText: {
-    fontSize: 14,
-    fontWeight: '200',
-    textTransform: 'uppercase',
+    alignItems: 'center',
   },
   selectedCourseExtraText: {
     fontSize: 12,
     fontWeight: '400',
+  },
+  editCourseText: {
+    fontSize: 12,
+    width: '30%',
+    textAlign: 'center',
+  },
+  editCourseTextLeft: {
+    fontSize: 14,
+    fontWeight: '200',
+    width: '30%',
+    textAlign: 'left',
+  },
+  editCourseTextRight: {
+    fontSize: 12,
+    width: '30%',
+    textAlign: 'right',
   },
 })
