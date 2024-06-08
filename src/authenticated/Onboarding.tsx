@@ -111,9 +111,10 @@ export default () => {
 
   const handleSetQuery = (e: string) => {
     setQuery(e)
-    if (query.length > 3) {
+    if (query.length >= 3) {
       debouncedQuery(query)
-    } else {
+      return
+    } else if (query.length < 3) {
       dispatch({
         type: QUERY_COURSES_SUCCESS,
         payload: [],
@@ -214,10 +215,7 @@ export default () => {
   }, [added])
 
   useEffect(() => {
-    if (!courses || courses.length === 0) {
-      console.log('querying course')
-      dispatch(queryCourses(query))
-    } else if (courses) {
+    if (courses !== undefined) {
       const except = courses?.filter((course) => !selectedCourses.some(
         (selectedCourses) => selectedCourses.shortName === course.shortName))
 
@@ -231,7 +229,7 @@ export default () => {
         }))
       }
     }
-  }, [query, courses])
+  }, [courses])
 
   useEffect(() => {
     if (initialCourses === null || initialCourses === undefined
