@@ -11,13 +11,12 @@ import {
   Text,
   Image,
   StyleSheet,
-  SafeAreaView,
   ScrollView,
 } from 'react-native'
 import React from 'react'
 import UserYears from '@components/Semester'
-import { CourseBrief } from 'src/reducers/courses'
 import Button from '@components/Button'
+import Onboarding from './Onboarding'
 
 type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/app'>
 
@@ -34,7 +33,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     display: 'flex',
     width: '100%',
-    backgroundColor: 'red',
   },
   userImage: {
     display: 'flex',
@@ -65,27 +63,31 @@ const MainPage = (props: Props) => {
   const dispatch = useAppDispatch()
 
   return (
-    <ScreenLayout>
-      <View style={{ flex: 1 }}>
-        <View style={styles.headerContainer}>
-          <View style={styles.userContainer}>
-            <Text style={styles.username}>{user?.name}</Text>
-            <Text style={styles.major}>{user?.major}</Text>
+    user?.onboarded ? (
+      <ScreenLayout>
+        <View style={{ flex: 1 }}>
+          <View style={styles.headerContainer}>
+            <View style={styles.userContainer}>
+              <Text style={styles.username}>{user?.name}</Text>
+              <Text style={styles.major}>{user?.major}</Text>
+            </View>
+            <Image
+              style={styles.userImage}
+              source={{ uri: user?.photoURL }}
+              alt="user profile picture"
+            />
           </View>
-          <Image
-            style={styles.userImage}
-            source={{ uri: user?.photoURL }}
-            alt='user profile picture'
-          />
-        </View>
-        <ScrollView contentContainerStyle={{ gap: 20}}>
-          <UserYears></UserYears>
-        </ScrollView>
-        <Button onPress={() => dispatch(signOutUser())} color="#039942">
+          <ScrollView contentContainerStyle={{ gap: 20 }}>
+            <UserYears></UserYears>
+          </ScrollView>
+          <Button onPress={() => dispatch(signOutUser())} color="#039942">
           Logout
-        </Button>
-      </View>
-    </ScreenLayout>
+          </Button>
+        </View>
+      </ScreenLayout>
+    ) : (
+      <Onboarding />
+    )
   )
 }
 

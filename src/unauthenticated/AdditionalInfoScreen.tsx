@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import ScreenLayout from '@components/ScreenLayout'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
 import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown'
 import Button from '@components/Button'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootUnauthenticatedStackParamList } from '.'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { signUpUser } from '@actions/user'
+import { getMajorsList } from '@actions/majors'
 
 const styles = StyleSheet.create({
   header: {
@@ -112,7 +113,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   const currentMajors = majorsList?.map((major, index) => ({
     id: String(index + 1),
     title: major,
-  })) ?? [{id: '1', title: 'whoops, something went wrong...'}]
+  })) ?? [{ id: '1', title: 'whoops, something went wrong...' }]
 
   const currentGradeLevels = [
     { id: '1', title: 'Freshman' },
@@ -122,14 +123,19 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   ]
 
   const handlePress = () => {
-    dispatch(signUpUser(name, major, email, password, 'P' + pid, +year, +semester))
+    dispatch(
+      signUpUser(name, major, email, password, 'P' + pid, +year, +semester),
+    )
   }
 
   useEffect(() => {
     if (errors) {
       navigation.pop()
     }
-  }, [errors])
+    if (majorsList?.length === 1 && majorsList[0] === 'whoops, something went wrong...') {
+      dispatch(getMajorsList())
+    }
+  }, [errors, majorsList])
 
   return (
     <ScreenLayout>
@@ -138,9 +144,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
       <View style={styles.form}>
         <View style={styles.textBox}>
           <View style={styles.disabledInputTextContainer}>
-            <Text style={styles.disabledInputText}>
-              P
-            </Text>
+            <Text style={styles.disabledInputText}>P</Text>
           </View>
           <TextInput
             value={pid}
@@ -167,6 +171,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           closeOnBlur={true}
           closeOnSubmit={false}
           dataSet={currentMajors}
+          direction={Platform.OS === 'ios' ? 'down' : 'up'}
         />
         <AutocompleteDropdown
           containerStyle={styles.dropDown}
@@ -191,18 +196,24 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           style={styles.textBox2}
           autoCapitalize="none"
           autoCorrect={false}
-          inputMode='numeric'
-          keyboardType='number-pad'
+          inputMode="numeric"
+          keyboardType="number-pad"
         />
         <Button
-          disabled={!pid || !major || major === 'whoops, something went wrong...'
-          || !year || (pid.length != 9) || +semester < 1}
+          disabled={
+            !pid ||
+            !major ||
+            major === 'whoops, something went wrong...' ||
+            !year ||
+            pid.length != 9 ||
+            +semester < 1
+          }
           color="#039942"
           fullWidth
           onPress={handlePress}
           loading={loading}
         >
-          Finish Account
+          Continue
         </Button>
       </View>
     </ScreenLayout>

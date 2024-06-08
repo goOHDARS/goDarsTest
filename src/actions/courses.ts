@@ -22,6 +22,28 @@ export const GET_INFO_REQUEST = '@@courses/GET_INFO_REQUEST'
 export const GET_INFO_SUCCESS = '@@courses/GET_INFO_SUCCESS'
 export const GET_INFO_FAILURE = '@@courses/GET_INFO_FAILURE'
 
+export const QUERY_COURSES_REQUEST = '@@courses/QUERY_COURSES_REQUEST'
+export const QUERY_COURSES_SUCCESS = '@@courses/QUERY_COURSES_SUCCESS'
+export const QUERY_COURSES_FAILURE = '@@courses/QUERY_COURSES_FAILURE'
+
+export const queryCourses = (search: string) => {
+  return async (dispatch: AppDispatch) => {
+    return authRequestWithDispatch({
+      dispatch,
+      endpoint: 'query_courses',
+      method: 'POST',
+      types: [
+        QUERY_COURSES_REQUEST,
+        QUERY_COURSES_SUCCESS,
+        QUERY_COURSES_FAILURE,
+      ],
+      data: {
+        search,
+      },
+    })
+  }
+}
+
 export const getInitialCourses = () => {
   return async (dispatch: AppDispatch) => {
     return authRequestWithDispatch({

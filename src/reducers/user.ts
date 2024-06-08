@@ -12,6 +12,7 @@ type User = {
   semester: number
   onboarded: boolean
   photoURL: string
+  credits: number
 }
 
 type UserState = BaseState & {

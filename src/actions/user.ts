@@ -53,7 +53,7 @@ export const signUpUser = (
   password: string,
   pid: string,
   year: number,
-  semester: number
+  semester: number,
 ) => {
   return async (dispatch: AppDispatch) => {
     dispatch({ type: SET_USER_REQUEST })
@@ -61,7 +61,7 @@ export const signUpUser = (
       const userPromise = await createUserWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       )
       await updateProfile(userPromise.user, { displayName: name })
     } catch (err: any) {
