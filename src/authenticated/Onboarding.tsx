@@ -1,6 +1,7 @@
 import {
   GET_COURSES_SUCCESS,
   getInitialCourses,
+  QUERY_COURSES_SUCCESS,
   queryCourses,
   setInitialCourses,
 } from '@actions/courses'
@@ -112,6 +113,11 @@ export default () => {
     setQuery(e)
     if (query.length > 3) {
       debouncedQuery(query)
+    } else {
+      dispatch({
+        type: QUERY_COURSES_SUCCESS,
+        payload: [],
+      })
     }
   }
 
