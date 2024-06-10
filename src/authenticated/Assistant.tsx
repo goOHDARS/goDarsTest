@@ -1,7 +1,7 @@
 import ScreenLayout from '@components/ScreenLayout'
-import { Text } from 'react-native'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { RootAuthenticatedTabBarParamList } from '.'
+import ChatScreen from '@components/ChatScreen'
 
 type Props = BottomTabScreenProps<
   RootAuthenticatedTabBarParamList,
@@ -11,7 +11,7 @@ type Props = BottomTabScreenProps<
 const Assistant = (props: Props) => {
   return (
     <ScreenLayout>
-      <Text>Assistant</Text>
+      <ChatScreen />
     </ScreenLayout>
   )
 }
