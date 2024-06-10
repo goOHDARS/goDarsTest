@@ -30,21 +30,24 @@ const ChatScreenRoot = (props: Props) => {
         {props.currentMessages
           .filter((message) => message.role !== 'system')
           .map((message, index) => (
-            <Pressable
-              key={index}
-              style={{
-                ...styles.message,
-                ...(message.role === 'user'
-                  ? { alignSelf: 'flex-end', backgroundColor: '#039942' }
-                  : {}),
-              }}
-            >
-              <Text style={{ color: '#ffffff' }}>{message.content}</Text>
+            <Pressable key={index} style={{ display: 'flex' }}>
+              <View
+                style={{
+                  ...styles.message,
+                  ...(message.role === 'user'
+                    ? { alignSelf: 'flex-end', backgroundColor: '#039942' }
+                    : {}),
+                }}
+              >
+                <Text style={{ color: '#ffffff' }}>{message.content}</Text>
+              </View>
             </Pressable>
           ))}
         {props.loading && (
-          <Pressable style={styles.message}>
-            <Loader speed={200} color="#ffffff" />
+          <Pressable style={{ display: 'flex' }}>
+            <View style={styles.message}>
+              <Loader speed={200} color="#ffffff" />
+            </View>
           </Pressable>
         )}
       </ScrollView>

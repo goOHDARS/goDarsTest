@@ -79,7 +79,7 @@ const MainPage = (props: Props) => {
           />
         </View>
         <ScrollView contentContainerStyle={{ gap: 20}}>
-          <UserYears></UserYears>
+          <UserYears />
         </ScrollView>
         <Button onPress={() => dispatch(signOutUser())} color="#039942">
           Logout
