@@ -8,6 +8,7 @@ type Major = {
   name: string
   planned_length: number
   semester_divisions: number[]
+  credits_required: number
 }
 
 type MajorsState = BaseState & {

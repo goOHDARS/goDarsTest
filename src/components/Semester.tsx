@@ -2,7 +2,10 @@ import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React, { useEffect } from 'react'
 import Divider from '@components/Divider'
 import { CourseBrief } from 'src/reducers/courses'
-import { useAppDispatch, useAppSelector } from '@hooks/store'
+import {
+  useAppDispatch,
+  useAppSelector,
+} from '@hooks/store'
 import { getCurrentMajor } from '@actions/majors'
 
 /**
@@ -21,8 +24,7 @@ const UserYears = () => {
   years.set(3, 'Junior')
   years.set(4, 'Senior')
 
-  const user = useAppSelector((state) => state.user?.user)
-  const userCourses = useAppSelector((state) => state.courses?.courses)
+  const userCourses = useAppSelector((state) => state.courses.courses)
   const major = useAppSelector((state) => state.majors.currentMajor)
   const dispatch = useAppDispatch()
 
@@ -34,7 +36,8 @@ const UserYears = () => {
 
   for (let i = 1; i < (major?.planned_length ?? 8) + 1; i++) {
     const bool = i % 2 === 1
-    const list = userCourses?.filter((course) => course.semester === i)
+    const list: CourseBrief[] = userCourses?.filter((course) => course.semester === i) ?? []
+
     viewSemesters.push(
       <Pressable
         key={i}
@@ -82,15 +85,13 @@ const UserYears = () => {
             </View>
             {viewSemesters[i + 1]}
           </View>
-        </View>
+        </View>,
       )
     }
   }
 
   return viewYears
 }
-
-export default UserYears
 
 const styles = StyleSheet.create({
   title: {
@@ -165,3 +166,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 })
+
+export default UserYears

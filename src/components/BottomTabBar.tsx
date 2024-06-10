@@ -38,6 +38,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: Platform.OS === 'ios' ? 30 : 10,
     elevation: 20,
+    borderTopColor: '#F2F2F2',
+    borderTopWidth: 1,
   },
   tabContainer: {
     display: 'flex',

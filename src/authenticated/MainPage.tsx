@@ -1,23 +1,13 @@
 import { signOutUser } from '@actions/user'
 import ScreenLayout from '@components/ScreenLayout'
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '@hooks/store'
+import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { RootAuthenticatedTabBarParamList } from '.'
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native'
+import { View, Text, Image, StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 import UserYears from '@components/Semester'
-import { CourseBrief } from 'src/reducers/courses'
 import Button from '@components/Button'
+import Onboarding from './Onboarding'
 
 type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/app'>
 
@@ -34,7 +24,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     display: 'flex',
     width: '100%',
-    backgroundColor: 'red',
   },
   userImage: {
     display: 'flex',
@@ -64,7 +53,7 @@ const MainPage = (props: Props) => {
   const user = useAppSelector((state) => state.user?.user)
   const dispatch = useAppDispatch()
 
-  return (
+  return user?.onboarded ? (
     <ScreenLayout>
       <View style={{ flex: 1 }}>
         <View style={styles.headerContainer}>
@@ -75,10 +64,10 @@ const MainPage = (props: Props) => {
           <Image
             style={styles.userImage}
             source={{ uri: user?.photoURL }}
-            alt='user profile picture'
+            alt="user profile picture"
           />
         </View>
-        <ScrollView contentContainerStyle={{ gap: 20}}>
+        <ScrollView contentContainerStyle={{ gap: 20 }}>
           <UserYears />
         </ScrollView>
         <Button onPress={() => dispatch(signOutUser())} color="#039942">
@@ -86,6 +75,8 @@ const MainPage = (props: Props) => {
         </Button>
       </View>
     </ScreenLayout>
+  ) : (
+    <Onboarding />
   )
 }
 
