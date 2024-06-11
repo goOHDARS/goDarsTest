@@ -1,9 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-} from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React, { useEffect } from 'react'
 import Divider from '@components/Divider'
 import { CourseBrief } from 'src/reducers/courses'
@@ -45,6 +40,7 @@ const UserYears = () => {
 
     viewSemesters.push(
       <Pressable
+        key={i}
         style={
           bool ? styles.fallSemesterContainer : styles.springSemesterContainer
         }
@@ -65,7 +61,7 @@ const UserYears = () => {
         >
           {bool ? 'Fall' : 'Spring'}
         </Text>
-      </Pressable>,
+      </Pressable>
     )
   }
 

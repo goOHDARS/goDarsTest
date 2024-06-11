@@ -22,7 +22,7 @@ const AuthenticatedRoot = () => {
     <App.Navigator
       initialRouteName="/app"
       screenOptions={{ headerShown: false }}
-      tabBar={BottomTabBar}
+      tabBar={(props) => <BottomTabBar {...props} />}
     >
       <App.Screen name="/app" component={MainPage} />
       <App.Screen name="/course-select" component={CourseSelect} />

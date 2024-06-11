@@ -2,6 +2,7 @@ import { combineReducers } from '@reduxjs/toolkit'
 import user from './user'
 import majors from './majors'
 import courses from './courses'
+import conversations from './conversations'
 
 export type Error = {
   message: string
@@ -17,4 +18,5 @@ export default combineReducers({
   user,
   majors,
   courses,
+  conversations,
 })

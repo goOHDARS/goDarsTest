@@ -1,5 +1,7 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
+import { useEffect, useState } from 'react'
 import {
+  Keyboard,
   Platform,
   StyleSheet,
   Text,
@@ -50,6 +52,37 @@ const styles = StyleSheet.create({
 })
 
 const BottomTabBar = ({ state, navigation }: BottomTabBarProps) => {
+  const [keyboardShown, setKeyboardShown] = useState(false)
+
+  useEffect(() => {
+    const keyboardShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardShown(true)
+    })
+    // only works on IOS
+    const keyboardWillShowListener = Keyboard.addListener(
+      'keyboardWillShow',
+      () => {
+        setKeyboardShown(true)
+      }
+    )
+    const keyboardHiddenListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardShown(false)
+      }
+    )
+
+    return () => {
+      keyboardShowListener.remove()
+      keyboardWillShowListener.remove()
+      keyboardHiddenListener.remove()
+    }
+  }, [])
+
+  if (keyboardShown) {
+    return null
+  }
+
   return (
     <View style={styles.container}>
       {state.routeNames.map((el, index) => {

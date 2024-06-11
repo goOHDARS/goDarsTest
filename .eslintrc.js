@@ -30,7 +30,7 @@ module.exports = {
     'no-console': 0,
     semi: ['error', 'never'],
     'object-curly-spacing': 'off',
-    'max-len': ['error', { code: 100 }],
+    'max-len': 'off',
     'operator-linebreak': 'off',
     'require-jsdoc': 'off',
     'import/namespace': 'off',

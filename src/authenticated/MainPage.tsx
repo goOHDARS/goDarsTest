@@ -1,18 +1,9 @@
 import { signOutUser } from '@actions/user'
 import ScreenLayout from '@components/ScreenLayout'
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '@hooks/store'
+import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { RootAuthenticatedTabBarParamList } from '.'
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-} from 'react-native'
+import { View, Text, Image, StyleSheet, ScrollView } from 'react-native'
 import React from 'react'
 import UserYears from '@components/Semester'
 import Button from '@components/Button'
@@ -62,32 +53,30 @@ const MainPage = (props: Props) => {
   const user = useAppSelector((state) => state.user?.user)
   const dispatch = useAppDispatch()
 
-  return (
-    user?.onboarded ? (
-      <ScreenLayout>
-        <View style={{ flex: 1 }}>
-          <View style={styles.headerContainer}>
-            <View style={styles.userContainer}>
-              <Text style={styles.username}>{user?.name}</Text>
-              <Text style={styles.major}>{user?.major}</Text>
-            </View>
-            <Image
-              style={styles.userImage}
-              source={{ uri: user?.photoURL }}
-              alt="user profile picture"
-            />
+  return user?.onboarded ? (
+    <ScreenLayout>
+      <View style={{ flex: 1 }}>
+        <View style={styles.headerContainer}>
+          <View style={styles.userContainer}>
+            <Text style={styles.username}>{user?.name}</Text>
+            <Text style={styles.major}>{user?.major}</Text>
           </View>
-          <ScrollView contentContainerStyle={{ gap: 20 }}>
-            <UserYears></UserYears>
-          </ScrollView>
-          <Button onPress={() => dispatch(signOutUser())} color="#039942">
-          Logout
-          </Button>
+          <Image
+            style={styles.userImage}
+            source={{ uri: user?.photoURL }}
+            alt="user profile picture"
+          />
         </View>
-      </ScreenLayout>
-    ) : (
-      <Onboarding />
-    )
+        <ScrollView contentContainerStyle={{ gap: 20 }}>
+          <UserYears />
+        </ScrollView>
+        <Button onPress={() => dispatch(signOutUser())} color="#039942">
+          Logout
+        </Button>
+      </View>
+    </ScreenLayout>
+  ) : (
+    <Onboarding />
   )
 }
 
