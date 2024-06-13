@@ -38,8 +38,11 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: Platform.OS === 'ios' ? 30 : 10,
     elevation: 20,
-    borderTopColor: '#F2F2F2',
-    borderTopWidth: 1,
+    shadowColor: '#000', // For iOS shadow
+    shadowOffset: { width: 0, height: -2 }, // Position the shadow above
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    backgroundColor: '#fff', // Ensure background color to see the shadow
   },
   tabContainer: {
     display: 'flex',
@@ -58,13 +61,7 @@ const BottomTabBar = ({ state, navigation }: BottomTabBarProps) => {
     const keyboardShowListener = Keyboard.addListener('keyboardDidShow', () => {
       setKeyboardShown(true)
     })
-    // only works on IOS
-    const keyboardWillShowListener = Keyboard.addListener(
-      'keyboardWillShow',
-      () => {
-        setKeyboardShown(true)
-      }
-    )
+
     const keyboardHiddenListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
@@ -74,12 +71,12 @@ const BottomTabBar = ({ state, navigation }: BottomTabBarProps) => {
 
     return () => {
       keyboardShowListener.remove()
-      keyboardWillShowListener.remove()
       keyboardHiddenListener.remove()
     }
   }, [])
 
-  if (keyboardShown) {
+  // only hide if android
+  if (keyboardShown && Platform.OS === 'android') {
     return null
   }
 

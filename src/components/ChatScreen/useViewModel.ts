@@ -5,12 +5,16 @@ import {
   getResponse,
 } from '@actions/conversations'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { ScrollView, TextInput } from 'react-native'
 import { Message } from 'src/reducers/conversations'
 
 const useViewModel = () => {
   const dispatch = useAppDispatch()
   const [message, setMessage] = useState('')
+  const scrollViewRef = useRef<ScrollView>(null)
+  const textInputRef = useRef<TextInput>(null)
+
   const { currentConversation, loading } = useAppSelector(
     (state) => state.conversations
   )
@@ -33,6 +37,7 @@ const useViewModel = () => {
       payload: [{ role: 'user', content: message } as Message],
     })
     setMessage('')
+    textInputRef.current?.blur()
   }
 
   // ensure conversation is reset
@@ -42,6 +47,8 @@ const useViewModel = () => {
   }, [])
 
   return {
+    scrollViewRef,
+    textInputRef,
     currentMessages: currentConversation?.messages ?? [],
     message,
     setMessage,

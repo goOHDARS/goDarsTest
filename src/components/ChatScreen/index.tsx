@@ -8,7 +8,6 @@ import {
   View,
 } from 'react-native'
 import Button from '../Button'
-import { useRef } from 'react'
 import Loader from 'react-native-three-dots'
 import styles from './styles'
 import useViewModel from './useViewModel'
@@ -16,14 +15,16 @@ import useViewModel from './useViewModel'
 type Props = ReturnType<typeof useViewModel>
 
 const ChatScreenRoot = (props: Props) => {
-  const scrollViewRef = useRef<ScrollView>(null)
-
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={styles.container}
+      keyboardVerticalOffset={55}
+    >
       <ScrollView
-        ref={scrollViewRef}
+        ref={props.scrollViewRef}
         onContentSizeChange={() =>
-          scrollViewRef.current?.scrollToEnd({ animated: true })
+          props.scrollViewRef.current?.scrollToEnd({ animated: true })
         }
         contentContainerStyle={styles.messageContainer}
       >
@@ -51,11 +52,9 @@ const ChatScreenRoot = (props: Props) => {
           </Pressable>
         )}
       </ScrollView>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.actionsContainer}
-      >
+      <View style={styles.actionsContainer}>
         <TextInput
+          ref={props.textInputRef}
           style={styles.textInput}
           value={props.message}
           onChangeText={props.setMessage}
@@ -70,8 +69,8 @@ const ChatScreenRoot = (props: Props) => {
         >
           Send
         </Button>
-      </KeyboardAvoidingView>
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   )
 }
 
