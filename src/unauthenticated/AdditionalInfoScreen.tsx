@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react'
 import ScreenLayout from '@components/ScreenLayout'
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
-import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown'
+import {
+  AutocompleteDropdown,
+  TAutocompleteDropdownItem,
+} from 'react-native-autocomplete-dropdown'
 import Button from '@components/Button'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootUnauthenticatedStackParamList } from '.'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { signUpUser } from '@actions/user'
 import { getMajorsList } from '@actions/majors'
+import dayjs from 'dayjs'
 
 const styles = StyleSheet.create({
   header: {
@@ -93,6 +97,16 @@ const styles = StyleSheet.create({
   },
 })
 
+const getCurrentYears = () => {
+  const currentYear = dayjs().year()
+  const currentStartYears = []
+  for (let i = 0; i < 10; i++) {
+    currentStartYears.push({ id: String(i), title: String(currentYear - i) })
+  }
+
+  return currentStartYears
+}
+
 type Props = NativeStackScreenProps<
   RootUnauthenticatedStackParamList,
   '/additional-info'
@@ -103,7 +117,6 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   const [pid, setPid] = useState('')
   const [major, setMajor] = useState('')
   const [year, setYear] = useState('')
-  const [semester, setSemester] = useState('')
   const errors = useAppSelector((state) => state.user.error)
   const loading = useAppSelector((state) => state.user.loading)
   const majorsList = useAppSelector((state) => state.majors.list)
@@ -115,16 +128,14 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     title: major,
   })) ?? [{ id: '1', title: 'whoops, something went wrong...' }]
 
-  const currentGradeLevels = [
-    { id: '1', title: 'Freshman' },
-    { id: '2', title: 'Sophomore' },
-    { id: '3', title: 'Junior' },
-    { id: '4', title: 'Senior' },
-  ]
+  const getAbsoluteSemester = () => {
+    const collegeYear = dayjs().year() - +year + 1
+    return (+collegeYear - 1) * 2 + (dayjs().month() >= 7 ? 1 : 2)
+  }
 
   const handlePress = () => {
     dispatch(
-      signUpUser(name, major, email, password, 'P' + pid, +year, +semester),
+      signUpUser(name, major, email, password, 'P' + pid, getAbsoluteSemester())
     )
   }
 
@@ -132,7 +143,10 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     if (errors) {
       navigation.pop()
     }
-    if (majorsList?.length === 1 && majorsList[0] === 'whoops, something went wrong...') {
+    if (
+      majorsList?.length === 1 &&
+      majorsList[0] === 'whoops, something went wrong...'
+    ) {
       dispatch(getMajorsList())
     }
   }, [errors, majorsList])
@@ -177,27 +191,16 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           containerStyle={styles.dropDown}
           textInputProps={{
             style: styles.dropDownText,
-            placeholder: 'Current Grade',
+            placeholder: 'Year Started Major',
             placeholderTextColor: '#000000',
           }}
           inputContainerStyle={styles.dropDownInput}
           rightButtonsContainerStyle={{ height: 50 }}
-          onSelectItem={(item) => setYear(item?.id ?? '')}
+          onSelectItem={(item) => setYear(item?.title ?? '')}
           clearOnFocus={false}
           closeOnBlur={true}
           closeOnSubmit={false}
-          dataSet={currentGradeLevels}
-        />
-        <TextInput
-          value={semester}
-          onChangeText={(e) => setSemester(e)}
-          placeholder="Current Semester"
-          placeholderTextColor={'black'}
-          style={styles.textBox2}
-          autoCapitalize="none"
-          autoCorrect={false}
-          inputMode="numeric"
-          keyboardType="number-pad"
+          dataSet={getCurrentYears()}
         />
         <Button
           disabled={
@@ -205,8 +208,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
             !major ||
             major === 'whoops, something went wrong...' ||
             !year ||
-            pid.length != 9 ||
-            +semester < 1
+            pid.length != 9
           }
           color="#039942"
           fullWidth
