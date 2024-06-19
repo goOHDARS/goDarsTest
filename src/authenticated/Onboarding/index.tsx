@@ -1,33 +1,70 @@
+import {
+  GET_COURSES_SUCCESS,
+  getInitialCourses,
+  QUERY_COURSES_SUCCESS,
+  queryCourses,
+  setInitialCourses,
+} from '@actions/courses'
+import { SET_USER_SUCCESS } from '@actions/user'
 import Button from '@components/Button'
 import ScreenLayout from '@components/ScreenLayout'
 import SelectedCourses from './SelectedCourses'
 import Snackbar from '@components/Snackbar'
 import {
+  useAppDispatch,
+  useAppSelector,
+} from '@hooks/store'
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+import {
   View,
   Text,
   ScrollView,
   Platform,
+  Alert,
+  Animated,
   Modal,
-  TextInput,
   Pressable,
+  TextInput,
 } from 'react-native'
-import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown'
-import { HelpCircle, Info, Search } from 'react-native-feather'
-import useViewModel from './useViewModel'
+import {
+  AutocompleteDropdown,
+  TAutocompleteDropdownItem,
+} from 'react-native-autocomplete-dropdown'
+import {
+  HelpCircle,
+  Info,
+  Search,
+} from 'react-native-feather'
+import {
+  CourseBrief,
+  UserCourse,
+} from 'src/reducers/courses'
+import _ from 'lodash'
 import styles from './styles'
+import useViewModel from './useViewModel'
 
 type Props = ReturnType<typeof useViewModel>
 
 const OnboardingRoot = (props: Props) => {
   return (
-    <ScreenLayout style={{ justifyContent: 'space-between' }}>
-      <View
+    <ScreenLayout style={{ justifyContent: 'space-between' }} onDismissFunc={() => {
+      props.editing ? props.setEditing(false) : undefined
+    }}>
+      <Animated.View
         style={{
+          transform: [
+            {translateY: props.translation},
+            {perspective: 1000}, // without this line this Animation will not render on Android while working fine on iOS
+          ],
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
           alignItems: 'center',
-          gap: 15,
+          gap: 10,
         }}
       >
         <Snackbar
@@ -57,6 +94,7 @@ const OnboardingRoot = (props: Props) => {
               controller={(controller) => {
                 props.dropdowncontroller.current = controller
               }}
+              
               loading={props.coursesLoading}
               onChangeText={props.handleSetQuery}
               containerStyle={styles.textBoxInput}
@@ -88,14 +126,21 @@ const OnboardingRoot = (props: Props) => {
             />
           </View>
         </View>
-        <Text style={{ fontSize: 11 }}>
-          Please add all courses with their respective semester.
-        </Text>
+        {props.infoVisible ?
+          <View style={{ display: 'flex', flexDirection: 'row', width: '90%', gap: 5}}>
+            <Info color={'black'} width={15}></Info>
+            <Text style={{ fontSize: 11 }}>
+              {'Below are suggested semesters for these courses,' +
+            ' edit the semester if the course was taken at a different time.' +
+            ' Scroll to view the whole name of the course in the Clipboard.'}
+            </Text>
+          </View>
+          : null}
         <View style={styles.clipboardContainer}>
           <Text style={styles.clipboard}>Clipboard</Text>
           <View style={styles.divider}></View>
         </View>
-      </View>
+      </Animated.View>
       <View
         style={{
           display: 'flex',
@@ -110,18 +155,29 @@ const OnboardingRoot = (props: Props) => {
         <Text style={styles.editCourseText}>Semester</Text>
         <Text style={styles.editCourseText}>Credits</Text>
       </View>
-      <ScrollView
-        contentContainerStyle={{ gap: 5, width: '100%' }}
+      <Animated.ScrollView
+        nestedScrollEnabled={true}
+        contentContainerStyle={{ gap: 5, width: '75%' }}
         showsVerticalScrollIndicator={true}
         indicatorStyle="black"
-      >
+        ref={props.scrollViewRef}
+        onContentSizeChange={() => props.scrollViewRef.current?.scrollToEnd({ animated: true })}
+        scrollToOverflowEnabled={props.editing ? false : true}
+        style={{transform: [
+          {translateY: props.translation},
+          {perspective: 1000}, // without this line this Animation will not render on Android while working fine on iOS
+        ],
+        marginBottom: '2.5%',
+        }}
+      />
         <SelectedCourses
-          credits={props.credits}
+          credits={props.credits} 
           setCredits={props.setCredits}
+          selectedCourses={props.selectedCourses} 
           setSelectedCourses={props.setSelectedCourses}
-          selectedCourses={props.selectedCourses}
-        />
-      </ScrollView>
+          setEditing={props.setEditing}
+          >
+        </SelectedCourses>
       <View
         style={{
           display: 'flex',
@@ -165,7 +221,9 @@ const OnboardingRoot = (props: Props) => {
         }}
       >
         <Button
-          disabled={props.selectedCourses.length === 0}
+          disabled={props.selectedCourses.filter((course) =>
+            course.semester?.toString() === '' || course.semester === 0
+            || course.semester === null || course.semester === undefined).length > 0}
           fullWidth
           onPress={() => props.setModalVisible(true)}
         >

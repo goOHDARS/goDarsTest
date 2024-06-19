@@ -114,3 +114,16 @@ export const resetUserErrors = () => {
     dispatch({ type: CLEAR_USER_ERRORS })
   }
 }
+
+// /**
+//  * @brief Clears only the documents, not the authenticated users.
+//  */
+// export const clearTestUsers = () => {
+//   return async (dispatch: AppDispatch) => {
+//     return authRequestWithDispatch({
+//       dispatch,
+//       endpoint: 'clear_test_users',
+//       types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
+//     })
+//   }
+// }
