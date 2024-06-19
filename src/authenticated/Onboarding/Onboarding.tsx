@@ -5,7 +5,7 @@ import {
   queryCourses,
   setInitialCourses,
 } from '@actions/courses'
-import { getCurrentUser } from '@actions/user'
+import { getCurrentUser, SET_USER_SUCCESS } from '@actions/user'
 import Button from '@components/Button'
 import ScreenLayout from '@components/ScreenLayout'
 import SelectedCourses from '@components/SelectedCourses'
@@ -16,25 +16,22 @@ import {
 } from '@hooks/store'
 import {
   useEffect,
+  useRef,
   useState,
 } from 'react'
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   Platform,
   Alert,
-  Modal,
-  TextInput,
-  Pressable,
+  Animated,
 } from 'react-native'
 import {
   AutocompleteDropdown,
   TAutocompleteDropdownItem,
 } from 'react-native-autocomplete-dropdown'
 import {
-  HelpCircle,
   Info,
   Search,
 } from 'react-native-feather'
@@ -42,7 +39,8 @@ import {
   CourseBrief,
   UserCourse,
 } from 'src/reducers/courses'
-import _, { debounce } from 'lodash'
+import _ from 'lodash'
+import { styles } from './styles'
 
 export default () => {
   const dispatch = useAppDispatch()
@@ -53,18 +51,25 @@ export default () => {
   const major = useAppSelector((state) => state.majors.currentMajor)
   const loading = useAppSelector((state) => state.user.loading)
 
+  const [editing, setEditing] = useState(false)
+  const [typing, setTyping] = useState(false)
+
   const [added, setAdded] = useState<CourseBrief>()
   const [isVisible, setIsVisible] = useState(false)
 
   const [credits, setCredits] = useState(0.0)
   const [selectedCourses, setSelectedCourses] = useState<CourseBrief[]>([])
 
-  const [modalVisible, setModalVisible] = useState(false)
+  const [infoVisible, setInfoVisible] = useState(true)
 
   const [dataSet, setDataSet] = useState<TAutocompleteDropdownItem[]>([])
   const [query, setQuery] = useState('')
 
   const [initialized, setInitialized] = useState(false)
+
+  const scrollViewRef = useRef<ScrollView>(null)
+
+  const translation = useRef(new Animated.Value(0)).current
 
   const handleSelectCourse = (courseParam: TAutocompleteDropdownItem) => {
     if (!courseParam || !courseParam.title) return
@@ -111,10 +116,11 @@ export default () => {
 
   const handleSetQuery = (e: string) => {
     setQuery(e)
-    if (query.length >= 3) {
+    setTyping(true)
+    if (e.length >= 3) {
       debouncedQuery(query)
       return
-    } else if (query.length < 3) {
+    } else if (e.length < 3) {
       dispatch({
         type: QUERY_COURSES_SUCCESS,
         payload: [],
@@ -147,58 +153,29 @@ export default () => {
         subcategory: course.subcategory,
       }
     })
+
     // There were some promise resolution issues with the following two lines
     await dispatch(setInitialCourses(omitArr))
-    await dispatch(getCurrentUser())
     dispatch({
       type: GET_COURSES_SUCCESS,
       payload: selectedCourses,
     })
+    dispatch({
+      type: SET_USER_SUCCESS,
+      payload: {
+        ...user,
+        credits: selectedCourses.reduce((acc, course) => acc + course.credits, 0),
+      },
+    })
+    await dispatch(getCurrentUser())
   }
-  const handleEditSemester = (changedCourse: CourseBrief, newSemester: string) => {
-    if (+newSemester > 0 || newSemester === '') {
-      if (user?.semester && user?.semester >= +newSemester) {
-        const updatedCourses = selectedCourses.map((course) => {
-          if (course.shortName === changedCourse.shortName) {
-            return { ...course, semester: +newSemester }
-          }
-          return course
-        })
-        setSelectedCourses(updatedCourses)
-      } else {
-        Alert.alert('goOHDARS', 'Cannot set semester higher than current semester.', [
-          {
-            text: 'Cancel',
-            style: 'destructive',
-          },
-        ])
-        const updatedCourses = selectedCourses.map((course) => {
-          if (course.shortName === changedCourse.shortName) {
-            return { ...course, semester: 0 } // Create a new object with updated semester
-          }
-          return course
-        })
-        setSelectedCourses(updatedCourses)
-      }
-    }
-  }
-
-  const handleEditSemesters = () => {
-    setModalVisible(true)
-  }
-
-  useEffect(() => {
-    if (isVisible) {
-      const timeout = setTimeout(() => {
-        setIsVisible(false)
-      }, 3000)
-
-      return () => clearTimeout(timeout)
-    }
-  }, [isVisible])
 
   useEffect(() => {
     if (added && courses) {
+      if (infoVisible) {
+        setInfoVisible(false)
+      }
+
       const except = courses?.filter((course) => !selectedCourses.some(
         (selectedCourses) => selectedCourses.shortName === course.shortName))
 
@@ -212,9 +189,13 @@ export default () => {
         }))
       }
     }
-  }, [added])
+    if (isVisible) {
+      const timeout = setTimeout(() => {
+        setIsVisible(false)
+      }, 2500)
 
-  useEffect(() => {
+      return () => clearTimeout(timeout)
+    }
     if (courses !== undefined) {
       const except = courses?.filter((course) => !selectedCourses.some(
         (selectedCourses) => selectedCourses.shortName === course.shortName))
@@ -229,7 +210,18 @@ export default () => {
         }))
       }
     }
-  }, [courses])
+    if (editing) {
+      Animated.timing(translation, {
+        toValue: -50,
+        useNativeDriver: true,
+      }).start()
+    } else {
+      Animated.timing(translation, {
+        toValue: 0,
+        useNativeDriver: true,
+      }).start()
+    }
+  }, [isVisible, added, courses, editing])
 
   useEffect(() => {
     if (initialCourses === null || initialCourses === undefined
@@ -243,14 +235,20 @@ export default () => {
   })
 
   return (
-    <ScreenLayout style={{ justifyContent: 'space-between' }}>
-      <View
+    <ScreenLayout style={{ justifyContent: 'space-between' }} onDismissFunc={() => {
+      editing ? setEditing(false) : undefined
+    }}>
+      <Animated.View
         style={{
+          transform: [
+            {translateY: translation},
+            {perspective: 1000}, // without this line this Animation will not render on Android while working fine on iOS
+          ],
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
           alignItems: 'center',
-          gap: 15,
+          gap: 10,
         }}
       >
         <Snackbar
@@ -272,16 +270,21 @@ export default () => {
             </View>
             <AutocompleteDropdown
               onChangeText={(e) => handleSetQuery(e)}
+              onFocus={() => {
+                editing ? setEditing(false) : null
+              }}
               containerStyle={styles.textBoxInput}
               textInputProps={{
                 style: styles.dropDownText,
-                placeholder: 'Search for a course...',
-                placeholderTextColor: '#000000',
+                placeholder: 'CS4040...',
+                placeholderTextColor: '#BBBBBB',
               }}
               inputContainerStyle={styles.dropDownInput}
               rightButtonsContainerStyle={{ height: 50 }}
               onSelectItem={(course) => {
-                handleSelectCourse(course)
+                handleSelectCourse(course),
+                setTyping(false),
+                setEditing(false)
               }}
               showClear={false}
               clearOnFocus={true}
@@ -303,31 +306,54 @@ export default () => {
             />
           </View>
         </View>
-        <Text style={{ fontSize: 11}}>Please add all courses with their respective semester.</Text>
+        {infoVisible ?
+          <View style={{ display: 'flex', flexDirection: 'row', width: '90%', gap: 5}}>
+            <Info color={'black'} width={15}></Info>
+            <Text style={{ fontSize: 11 }}>
+              {'Below are suggested semesters for these courses,' +
+            ' edit the semester if the course was taken at a different time.' +
+            ' Scroll to view the whole name of the course in the Clipboard.'}
+            </Text>
+          </View>
+          : null}
         <View style={styles.clipboardContainer}>
           <Text style={styles.clipboard}>Clipboard</Text>
           <View style={styles.divider}></View>
         </View>
-      </View>
-      <View style={{ display: 'flex', flexDirection: 'row',
-        marginBottom: '2.5%', marginTop: '2.5%', justifyContent: 'space-between', width: '75%'}}>
+      </Animated.View>
+      <Animated.View style={{ transform: [
+        {translateY: translation},
+        {perspective: 1000}, // without this line this Animation will not render on Android while working fine on iOS
+      ], display: 'flex', flexDirection: 'row',
+      justifyContent: 'space-between', width: '75%', marginBottom: '2.5%'}}>
         <Text style={styles.editCourseTextLeft}>Course Name</Text>
         <Text style={styles.editCourseText}>Semester</Text>
         <Text style={styles.editCourseText}>Credits</Text>
-      </View>
-      <ScrollView
-        contentContainerStyle={{ gap: 5, width: '100%' }}
+      </Animated.View>
+      <Animated.ScrollView
+        nestedScrollEnabled={true}
+        contentContainerStyle={{ gap: 5, width: '75%' }}
         showsVerticalScrollIndicator={true}
         indicatorStyle="black"
+        ref={scrollViewRef}
+        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+        scrollToOverflowEnabled={editing ? false : true}
+        style={{transform: [
+          {translateY: translation},
+          {perspective: 1000}, // without this line this Animation will not render on Android while working fine on iOS
+        ],
+        marginBottom: '2.5%',
+        }}
       >
         <SelectedCourses
           courses={courses ?? []}
           dataSet={dataSet} setDataSet={setDataSet}
           credits={credits} setCredits={setCredits}
-          setSelectedCourses={setSelectedCourses}
-          selectedCourses={selectedCourses}>
+          selectedCourses={selectedCourses} setSelectedCourses={setSelectedCourses}
+          setEditing={setEditing}
+          scrollRef={scrollViewRef}>
         </SelectedCourses>
-      </ScrollView>
+      </Animated.ScrollView>
       <View style={{ display: 'flex', flexDirection: 'row',
         width: '75%', justifyContent: 'space-between',
         marginTop: 10}}>
@@ -357,175 +383,16 @@ export default () => {
         }}
       >
         <Button
-          disabled={selectedCourses.length === 0}
+          disabled={selectedCourses.filter((course) =>
+            course.semester?.toString() === '' || course.semester === 0
+            || course.semester === null || course.semester === undefined).length > 0}
           fullWidth
-          onPress={handleEditSemesters}
+          onPress={handleContinuePress}
+          loading={loading}
         >
-          Edit Semesters
+          Finish Account
         </Button>
-        <Modal animationType='slide' visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)} presentationStyle='pageSheet'>
-          <ScreenLayout>
-            <View style=
-              {{display: 'flex', width: '100%', height: '90%', alignItems: 'center'}}>
-              <View
-                style={{ display: 'flex', marginVertical: '10%', alignItems: 'center'}}>
-                <Text
-                  style={{ fontSize: 28, color: '#039942', fontWeight: '900' }}>
-                  Adjust your semesters
-                </Text>
-                <View
-                  style={{ display: 'flex', flexDirection: 'row',
-                    gap: 10, width: '90%', marginVertical: '5%'}}>
-                  <Info color={'black'} width={15}></Info>
-                  <Text style={{ fontSize: 11 }}>
-                    {'Below are suggested semesters for these courses,' +
-                    ' edit the semester if the course was taken at a different time'}
-                  </Text>
-                </View>
-              </View>
-              <View style={{ display: 'flex', flexDirection: 'row',
-                marginBottom: '2.5%', marginTop: '2.5%', width: '75%',
-                justifyContent: 'space-between'}}>
-                <Text style={styles.editCourseTextLeft}>Course Name</Text>
-                <Text style={styles.editCourseText}>Semester</Text>
-                <Text style={styles.editCourseTextRight}>Credits</Text>
-              </View>
-              <ScrollView style={{width: '75%'}}>
-                {selectedCourses.map((course, index) => {
-                  return (
-                    <Pressable style={{ display: 'flex', flexDirection: 'row',
-                      justifyContent: 'space-between', marginBottom: 10}} key={index}>
-                      <Text style={styles.editCourseTextLeft}>{course.shortName}</Text>
-                      <TextInput
-                        value={course?.semester?.toString() === '0' ? '' :
-                          course.semester?.toString()}
-                        onChangeText={(e) => {
-                          handleEditSemester(course, e)
-                        }}
-                        placeholder='edit me'
-                        style={styles.editCourseText}
-                        inputMode='decimal'
-                      />
-                      <Text style={styles.editCourseTextRight}>{course.credits}</Text>
-                    </Pressable>
-                  )
-                })}
-              </ScrollView>
-            </View>
-            <View style={{ display: 'flex', width: '90%', height: '10%',
-              alignContent: 'flex-end', justifyContent: 'center', gap: 5}}>
-              <View style={{ display: 'flex', flexDirection: 'row',
-                alignItems: 'center', justifyContent: 'center'}}>
-                <HelpCircle strokeWidth={3}></HelpCircle>
-                <Text style={{ fontSize: 12, marginLeft: 5}}>
-                  This allows goOHDARS to plan future schedules
-                </Text>
-              </View>
-              <Button
-                disabled={selectedCourses.filter((course) =>
-                  course.semester?.toString() === '' || course.semester === 0).length > 0}
-                fullWidth
-                onPress={handleContinuePress}
-                loading={loading}
-              >
-                  Finish Account
-              </Button>
-            </View>
-          </ScreenLayout>
-        </Modal>
       </View>
     </ScreenLayout>
   )
 }
-
-const styles = StyleSheet.create({
-  headerContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-  },
-  title: {
-    fontSize: 50,
-    fontWeight: '900',
-    color: '#039942',
-  },
-  title2: {
-    fontSize: 30,
-    fontWeight: '900',
-    color: '#039942',
-  },
-  textBoxInput: {
-    display: 'flex',
-    fontSize: 20,
-    height: 50,
-    width: '90%',
-    borderTopRightRadius: 10,
-    borderBottomRightRadius: 10,
-  },
-  textBox: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '90%',
-    borderWidth: 1,
-    borderColor: '#039942',
-    borderRadius: 10,
-    height: 50,
-  },
-  disabledInputTextContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#039942',
-    height: 50,
-    width: 40,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
-  },
-  icon: {
-    color: '#ffffff',
-  },
-  dropDownText: {
-    fontSize: 20,
-    height: 50,
-  },
-  dropDownInput: {
-    borderRadius: 10,
-    backgroundColor: '#ffffff00',
-    width: '100%',
-  },
-  clipboardContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '75%',
-  },
-  clipboard: {
-    display: 'flex',
-    fontSize: 24,
-    textAlign: 'left',
-    fontWeight: '200',
-    textTransform: 'uppercase',
-  },
-  divider: {
-    borderBottomColor: 'black',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    marginBottom: 10,
-  },
-  editCourseText: {
-    fontSize: 12,
-    width: '30%',
-    textAlign: 'center',
-  },
-  editCourseTextLeft: {
-    fontSize: 12,
-    width: '30%',
-    textAlign: 'left',
-  },
-  editCourseTextRight: {
-    fontSize: 12,
-    width: '30%',
-    textAlign: 'right',
-  },
-})

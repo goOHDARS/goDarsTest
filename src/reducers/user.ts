@@ -12,6 +12,7 @@ type User = {
   semester: number
   onboarded: boolean
   photoURL: string
+  borderURLColor: string
   credits: number
 }
 
