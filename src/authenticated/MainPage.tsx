@@ -53,6 +53,8 @@ const MainPage = (props: Props) => {
   const user = useAppSelector((state) => state.user?.user)
   const dispatch = useAppDispatch()
 
+  console.log(user)
+
   return user?.onboarded ? (
     <ScreenLayout>
       <View style={{ flex: 1 }}>

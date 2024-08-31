@@ -1,10 +1,7 @@
 import { useEffect, useState } from 'react'
 import ScreenLayout from '@components/ScreenLayout'
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native'
-import {
-  AutocompleteDropdown,
-  TAutocompleteDropdownItem,
-} from 'react-native-autocomplete-dropdown'
+import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown'
 import Button from '@components/Button'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootUnauthenticatedStackParamList } from '.'
@@ -97,16 +94,6 @@ const styles = StyleSheet.create({
   },
 })
 
-const getCurrentYears = () => {
-  const currentYear = dayjs().year()
-  const currentStartYears = []
-  for (let i = 0; i < 10; i++) {
-    currentStartYears.push({ id: String(i), title: String(currentYear - i) })
-  }
-
-  return currentStartYears
-}
-
 type Props = NativeStackScreenProps<
   RootUnauthenticatedStackParamList,
   '/additional-info'
@@ -128,9 +115,16 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     title: major,
   })) ?? [{ id: '1', title: 'whoops, something went wrong...' }]
 
+  const currentGradeLevels = [
+    { id: '1', title: 'Freshman' },
+    { id: '2', title: 'Sophomore' },
+    { id: '3', title: 'Junior' },
+    { id: '4', title: 'Senior' },
+  ]
+
   const getAbsoluteSemester = () => {
-    const collegeYear = dayjs().year() - +year + 1
-    return (+collegeYear - 1) * 2 + (dayjs().month() >= 7 ? 1 : 2)
+    const semester = dayjs().month() >= 7 ? 1 : 2
+    return (+year - 1) * 2 + semester
   }
 
   const handlePress = () => {
@@ -191,16 +185,16 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           containerStyle={styles.dropDown}
           textInputProps={{
             style: styles.dropDownText,
-            placeholder: 'Year Started Major',
+            placeholder: 'Grade Level',
             placeholderTextColor: '#000000',
           }}
           inputContainerStyle={styles.dropDownInput}
           rightButtonsContainerStyle={{ height: 50 }}
-          onSelectItem={(item) => setYear(item?.title ?? '')}
+          onSelectItem={(item) => setYear(item?.id)}
           clearOnFocus={false}
           closeOnBlur={true}
           closeOnSubmit={false}
-          dataSet={getCurrentYears()}
+          dataSet={currentGradeLevels}
         />
         <Button
           disabled={
