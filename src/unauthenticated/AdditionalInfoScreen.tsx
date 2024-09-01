@@ -8,6 +8,7 @@ import { RootUnauthenticatedStackParamList } from '.'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { signUpUser } from '@actions/user'
 import { getMajorsList } from '@actions/majors'
+import dayjs from 'dayjs'
 
 const styles = StyleSheet.create({
   header: {
@@ -103,7 +104,6 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   const [pid, setPid] = useState('')
   const [major, setMajor] = useState('')
   const [year, setYear] = useState('')
-  const [semester, setSemester] = useState('')
   const errors = useAppSelector((state) => state.user.error)
   const loading = useAppSelector((state) => state.user.loading)
   const majorsList = useAppSelector((state) => state.majors.list)
@@ -122,9 +122,14 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     { id: '4', title: 'Senior' },
   ]
 
+  const getAbsoluteSemester = () => {
+    const semester = dayjs().month() >= 7 ? 1 : 2
+    return (+year - 1) * 2 + semester
+  }
+
   const handlePress = () => {
     dispatch(
-      signUpUser(name, major, email, password, 'P' + pid, +year, +semester),
+      signUpUser(name, major, email, password, 'P' + pid, getAbsoluteSemester())
     )
   }
 
@@ -132,7 +137,10 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     if (errors) {
       navigation.pop()
     }
-    if (majorsList?.length === 1 && majorsList[0] === 'whoops, something went wrong...') {
+    if (
+      majorsList?.length === 1 &&
+      majorsList[0] === 'whoops, something went wrong...'
+    ) {
       dispatch(getMajorsList())
     }
   }, [errors, majorsList])
@@ -177,27 +185,16 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           containerStyle={styles.dropDown}
           textInputProps={{
             style: styles.dropDownText,
-            placeholder: 'Current Grade',
+            placeholder: 'Grade Level',
             placeholderTextColor: '#000000',
           }}
           inputContainerStyle={styles.dropDownInput}
           rightButtonsContainerStyle={{ height: 50 }}
-          onSelectItem={(item) => setYear(item?.id ?? '')}
+          onSelectItem={(item) => setYear(item?.id)}
           clearOnFocus={false}
           closeOnBlur={true}
           closeOnSubmit={false}
           dataSet={currentGradeLevels}
-        />
-        <TextInput
-          value={semester}
-          onChangeText={(e) => setSemester(e)}
-          placeholder="Current Semester"
-          placeholderTextColor={'black'}
-          style={styles.textBox2}
-          autoCapitalize="none"
-          autoCorrect={false}
-          inputMode="numeric"
-          keyboardType="number-pad"
         />
         <Button
           disabled={
@@ -205,8 +202,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
             !major ||
             major === 'whoops, something went wrong...' ||
             !year ||
-            pid.length != 9 ||
-            +semester < 1
+            pid.length != 9
           }
           color="#039942"
           fullWidth

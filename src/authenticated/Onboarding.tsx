@@ -10,14 +10,8 @@ import Button from '@components/Button'
 import ScreenLayout from '@components/ScreenLayout'
 import SelectedCourses from '@components/SelectedCourses'
 import Snackbar from '@components/Snackbar'
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '@hooks/store'
-import {
-  useEffect,
-  useState,
-} from 'react'
+import { useAppDispatch, useAppSelector } from '@hooks/store'
+import { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -33,15 +27,8 @@ import {
   AutocompleteDropdown,
   TAutocompleteDropdownItem,
 } from 'react-native-autocomplete-dropdown'
-import {
-  HelpCircle,
-  Info,
-  Search,
-} from 'react-native-feather'
-import {
-  CourseBrief,
-  UserCourse,
-} from 'src/reducers/courses'
+import { HelpCircle, Info, Search } from 'react-native-feather'
+import { CourseBrief, UserCourse } from 'src/reducers/courses'
 import _, { debounce } from 'lodash'
 
 export default () => {
@@ -50,6 +37,7 @@ export default () => {
   const initialCourses = useAppSelector((state) => state.courses.courses)
   const user = useAppSelector((state) => state.user.user)
   const courses = useAppSelector((state) => state.courses.queryResults)
+  const coursesLoading = useAppSelector((state) => state.courses.loading)
   const major = useAppSelector((state) => state.majors.currentMajor)
   const loading = useAppSelector((state) => state.user.loading)
 
@@ -70,15 +58,15 @@ export default () => {
     if (!courseParam || !courseParam.title) return
 
     const selectedCourse = courses?.find(
-      (course) => course.shortName === courseParam.title,
+      (course) => course.shortName === courseParam.title
     )
 
     if (
       selectedCourse &&
       !selectedCourses.includes(
         selectedCourses.filter(
-          (course) => course.shortName === selectedCourse.shortName,
-        )[0],
+          (course) => course.shortName === selectedCourse.shortName
+        )[0]
       )
     ) {
       setSelectedCourses([...selectedCourses, selectedCourse])
@@ -88,7 +76,7 @@ export default () => {
     } else if (selectedCourse) {
       setSelectedCourses(
         selectedCourses.filter(
-          (course) => course.shortName !== selectedCourse.shortName,
+          (course) => course.shortName !== selectedCourse.shortName
         )
       )
     }
@@ -97,9 +85,9 @@ export default () => {
   const handleUndoCourse = (courseParam: CourseBrief | undefined) => {
     if (courseParam) {
       setSelectedCourses(
-        selectedCourses?.filter(
-          (course) => course.shortName !== courseParam.shortName,
-        ).sort()
+        selectedCourses
+          ?.filter((course) => course.shortName !== courseParam.shortName)
+          .sort()
       )
       setCredits(credits - courseParam?.credits)
     }
@@ -123,20 +111,24 @@ export default () => {
   }
 
   const handleContinuePress = () => {
-    Alert.alert('goOHDARS', 'Please confirm your edits to your courses. ' +
-    'This may impact future suggestions by goOHDARS.', [
-      {
-        text: 'Cancel',
-        style: 'destructive',
-      },
-      {
-        text: 'Confirm',
-        onPress: () => {
-          handleFinalFinishAccount()
+    Alert.alert(
+      'goOHDARS',
+      'Please confirm your edits to your courses. ' +
+        'This may impact future suggestions by goOHDARS.',
+      [
+        {
+          text: 'Cancel',
+          style: 'destructive',
         },
-        style: 'default',
-      },
-    ])
+        {
+          text: 'Confirm',
+          onPress: () => {
+            handleFinalFinishAccount()
+          },
+          style: 'default',
+        },
+      ]
+    )
   }
   const handleFinalFinishAccount = async () => {
     const omitArr: Omit<UserCourse, 'id'>[] = selectedCourses.map((course) => {
@@ -155,7 +147,10 @@ export default () => {
       payload: selectedCourses,
     })
   }
-  const handleEditSemester = (changedCourse: CourseBrief, newSemester: string) => {
+  const handleEditSemester = (
+    changedCourse: CourseBrief,
+    newSemester: string
+  ) => {
     if (+newSemester > 0 || newSemester === '') {
       if (user?.semester && user?.semester >= +newSemester) {
         const updatedCourses = selectedCourses.map((course) => {
@@ -166,12 +161,16 @@ export default () => {
         })
         setSelectedCourses(updatedCourses)
       } else {
-        Alert.alert('goOHDARS', 'Cannot set semester higher than current semester.', [
-          {
-            text: 'Cancel',
-            style: 'destructive',
-          },
-        ])
+        Alert.alert(
+          'goOHDARS',
+          'Cannot set semester higher than current semester.',
+          [
+            {
+              text: 'Cancel',
+              style: 'destructive',
+            },
+          ]
+        )
         const updatedCourses = selectedCourses.map((course) => {
           if (course.shortName === changedCourse.shortName) {
             return { ...course, semester: 0 } // Create a new object with updated semester
@@ -199,45 +198,63 @@ export default () => {
 
   useEffect(() => {
     if (added && courses) {
-      const except = courses?.filter((course) => !selectedCourses.some(
-        (selectedCourses) => selectedCourses.shortName === course.shortName))
+      const except = courses?.filter(
+        (course) =>
+          !selectedCourses.some(
+            (selectedCourses) => selectedCourses.shortName === course.shortName
+          )
+      )
 
       if (except) {
-        setDataSet(except?.map((course, index) => {
-          return {
-            key: index,
-            id: course.id,
-            title: course.shortName,
-          }
-        }))
+        setDataSet(
+          except?.map((course, index) => {
+            return {
+              key: index,
+              id: course.id,
+              title: course.shortName,
+            }
+          })
+        )
       }
     }
   }, [added])
 
   useEffect(() => {
     if (courses !== undefined) {
-      const except = courses?.filter((course) => !selectedCourses.some(
-        (selectedCourses) => selectedCourses.shortName === course.shortName))
+      const except = courses?.filter(
+        (course) =>
+          !selectedCourses.some(
+            (selectedCourses) => selectedCourses.shortName === course.shortName
+          )
+      )
 
       if (except) {
-        setDataSet(except?.map((course, index) => {
-          return {
-            key: index,
-            id: course.id,
-            title: course.shortName,
-          }
-        }))
+        setDataSet(
+          except?.map((course, index) => {
+            return {
+              key: index,
+              id: course.id,
+              title: course.shortName,
+            }
+          })
+        )
       }
     }
   }, [courses])
 
   useEffect(() => {
-    if (initialCourses === null || initialCourses === undefined
-      || initialCourses.length === 0 || !Array.isArray(initialCourses)) {
+    if (
+      initialCourses === null ||
+      initialCourses === undefined ||
+      initialCourses.length === 0 ||
+      !Array.isArray(initialCourses)
+    ) {
       dispatch(getInitialCourses())
     } else if (initialCourses && !initialized) {
       setSelectedCourses(initialCourses)
-      setCredits(initialCourses.reduce((acc, course) => acc + course.credits, 0))
+      setCredits(
+        initialCourses.reduce((acc, course) => acc + course.credits, 0)
+      )
       setInitialized(true)
     }
   })
@@ -271,6 +288,7 @@ export default () => {
               <Search color={'#ffffff'} strokeWidth={3}></Search>
             </View>
             <AutocompleteDropdown
+              loading={coursesLoading}
               onChangeText={(e) => handleSetQuery(e)}
               containerStyle={styles.textBoxInput}
               textInputProps={{
@@ -303,14 +321,24 @@ export default () => {
             />
           </View>
         </View>
-        <Text style={{ fontSize: 11}}>Please add all courses with their respective semester.</Text>
+        <Text style={{ fontSize: 11 }}>
+          Please add all courses with their respective semester.
+        </Text>
         <View style={styles.clipboardContainer}>
           <Text style={styles.clipboard}>Clipboard</Text>
           <View style={styles.divider}></View>
         </View>
       </View>
-      <View style={{ display: 'flex', flexDirection: 'row',
-        marginBottom: '2.5%', marginTop: '2.5%', justifyContent: 'space-between', width: '75%'}}>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          marginBottom: '2.5%',
+          marginTop: '2.5%',
+          justifyContent: 'space-between',
+          width: '75%',
+        }}
+      >
         <Text style={styles.editCourseTextLeft}>Course Name</Text>
         <Text style={styles.editCourseText}>Semester</Text>
         <Text style={styles.editCourseText}>Credits</Text>
@@ -322,15 +350,23 @@ export default () => {
       >
         <SelectedCourses
           courses={courses ?? []}
-          dataSet={dataSet} setDataSet={setDataSet}
-          credits={credits} setCredits={setCredits}
+          dataSet={dataSet}
+          setDataSet={setDataSet}
+          credits={credits}
+          setCredits={setCredits}
           setSelectedCourses={setSelectedCourses}
-          selectedCourses={selectedCourses}>
-        </SelectedCourses>
+          selectedCourses={selectedCourses}
+        ></SelectedCourses>
       </ScrollView>
-      <View style={{ display: 'flex', flexDirection: 'row',
-        width: '75%', justifyContent: 'space-between',
-        marginTop: 10}}>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          width: '75%',
+          justifyContent: 'space-between',
+          marginTop: 10,
+        }}
+      >
         <Text style={{ fontWeight: '700' }}>
           {credits === 0 ? '' : 'Selected Credits '}
         </Text>
@@ -338,8 +374,14 @@ export default () => {
           {credits === 0 ? '' : credits.toFixed(2)}
         </Text>
       </View>
-      <View style={{ display: 'flex', flexDirection: 'row',
-        width: '75%', justifyContent: 'space-between'}}>
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          width: '75%',
+          justifyContent: 'space-between',
+        }}
+      >
         <Text style={{ fontWeight: '700' }}>
           {'Required Credits to Graduate '}
         </Text>
@@ -363,73 +405,135 @@ export default () => {
         >
           Edit Semesters
         </Button>
-        <Modal animationType='slide' visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)} presentationStyle='pageSheet'>
+        <Modal
+          animationType="slide"
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+          presentationStyle="pageSheet"
+        >
           <ScreenLayout>
-            <View style=
-              {{display: 'flex', width: '100%', height: '90%', alignItems: 'center'}}>
+            <View
+              style={{
+                display: 'flex',
+                width: '100%',
+                height: '90%',
+                alignItems: 'center',
+              }}
+            >
               <View
-                style={{ display: 'flex', marginVertical: '10%', alignItems: 'center'}}>
+                style={{
+                  display: 'flex',
+                  marginVertical: '10%',
+                  alignItems: 'center',
+                }}
+              >
                 <Text
-                  style={{ fontSize: 28, color: '#039942', fontWeight: '900' }}>
+                  style={{ fontSize: 28, color: '#039942', fontWeight: '900' }}
+                >
                   Adjust your semesters
                 </Text>
                 <View
-                  style={{ display: 'flex', flexDirection: 'row',
-                    gap: 10, width: '90%', marginVertical: '5%'}}>
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 10,
+                    width: '90%',
+                    marginVertical: '5%',
+                  }}
+                >
                   <Info color={'black'} width={15}></Info>
                   <Text style={{ fontSize: 11 }}>
                     {'Below are suggested semesters for these courses,' +
-                    ' edit the semester if the course was taken at a different time'}
+                      ' edit the semester if the course was taken at a different time'}
                   </Text>
                 </View>
               </View>
-              <View style={{ display: 'flex', flexDirection: 'row',
-                marginBottom: '2.5%', marginTop: '2.5%', width: '75%',
-                justifyContent: 'space-between'}}>
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  marginBottom: '2.5%',
+                  marginTop: '2.5%',
+                  width: '75%',
+                  justifyContent: 'space-between',
+                }}
+              >
                 <Text style={styles.editCourseTextLeft}>Course Name</Text>
                 <Text style={styles.editCourseText}>Semester</Text>
                 <Text style={styles.editCourseTextRight}>Credits</Text>
               </View>
-              <ScrollView style={{width: '75%'}}>
+              <ScrollView style={{ width: '75%' }}>
                 {selectedCourses.map((course, index) => {
                   return (
-                    <Pressable style={{ display: 'flex', flexDirection: 'row',
-                      justifyContent: 'space-between', marginBottom: 10}} key={index}>
-                      <Text style={styles.editCourseTextLeft}>{course.shortName}</Text>
+                    <Pressable
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginBottom: 10,
+                      }}
+                      key={index}
+                    >
+                      <Text style={styles.editCourseTextLeft}>
+                        {course.shortName}
+                      </Text>
                       <TextInput
-                        value={course?.semester?.toString() === '0' ? '' :
-                          course.semester?.toString()}
+                        value={
+                          course?.semester?.toString() === '0'
+                            ? ''
+                            : course.semester?.toString()
+                        }
                         onChangeText={(e) => {
                           handleEditSemester(course, e)
                         }}
-                        placeholder='edit me'
+                        placeholder="edit me"
                         style={styles.editCourseText}
-                        inputMode='decimal'
+                        inputMode="decimal"
                       />
-                      <Text style={styles.editCourseTextRight}>{course.credits}</Text>
+                      <Text style={styles.editCourseTextRight}>
+                        {course.credits}
+                      </Text>
                     </Pressable>
                   )
                 })}
               </ScrollView>
             </View>
-            <View style={{ display: 'flex', width: '90%', height: '10%',
-              alignContent: 'flex-end', justifyContent: 'center', gap: 5}}>
-              <View style={{ display: 'flex', flexDirection: 'row',
-                alignItems: 'center', justifyContent: 'center'}}>
+            <View
+              style={{
+                display: 'flex',
+                width: '90%',
+                height: '10%',
+                alignContent: 'flex-end',
+                justifyContent: 'center',
+                gap: 5,
+              }}
+            >
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
                 <HelpCircle strokeWidth={3}></HelpCircle>
-                <Text style={{ fontSize: 12, marginLeft: 5}}>
+                <Text style={{ fontSize: 12, marginLeft: 5 }}>
                   This allows goOHDARS to plan future schedules
                 </Text>
               </View>
               <Button
-                disabled={selectedCourses.filter((course) =>
-                  course.semester?.toString() === '' || course.semester === 0).length > 0}
+                disabled={
+                  selectedCourses.filter(
+                    (course) =>
+                      course.semester?.toString() === '' ||
+                      course.semester === 0
+                  ).length > 0
+                }
                 fullWidth
                 onPress={handleContinuePress}
                 loading={loading}
               >
-                  Finish Account
+                Finish Account
               </Button>
             </View>
           </ScreenLayout>
