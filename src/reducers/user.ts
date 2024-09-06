@@ -50,6 +50,8 @@ export default (state = initialState, action: UnknownAction): UserState => {
         ...state,
         error: undefined,
       }
+    case user.LOGOUT_USER:
+      return initialState
     default:
       return state
   }

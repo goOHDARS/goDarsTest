@@ -2,11 +2,9 @@ import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React, { useEffect } from 'react'
 import Divider from '@components/Divider'
 import { CourseBrief } from 'src/reducers/courses'
-import {
-  useAppDispatch,
-  useAppSelector,
-} from '@hooks/store'
+import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { getCurrentMajor } from '@actions/majors'
+import { getCourses } from '@actions/courses'
 
 /**
  * @brief A year component that displays one of the (four)?
@@ -30,13 +28,17 @@ const UserYears = () => {
 
   useEffect(() => {
     dispatch(getCurrentMajor())
+    if (!userCourses || userCourses.length === 0) {
+      dispatch(getCourses())
+    }
   }, [])
 
   const viewSemesters = []
 
   for (let i = 1; i < (major?.planned_length ?? 8) + 1; i++) {
     const bool = i % 2 === 1
-    const list: CourseBrief[] = userCourses?.filter((course) => course.semester === i) ?? []
+    const list: CourseBrief[] =
+      userCourses?.filter((course) => course.semester === i) ?? []
 
     viewSemesters.push(
       <Pressable
@@ -85,7 +87,7 @@ const UserYears = () => {
             </View>
             {viewSemesters[i + 1]}
           </View>
-        </View>,
+        </View>
       )
     }
   }

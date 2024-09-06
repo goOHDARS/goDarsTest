@@ -1,10 +1,10 @@
+import React from 'react'
 import { signOutUser } from '@actions/user'
 import ScreenLayout from '@components/ScreenLayout'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { RootAuthenticatedTabBarParamList } from '.'
 import { View, Text, Image, StyleSheet, ScrollView } from 'react-native'
-import React from 'react'
 import UserYears from '@components/Semester'
 import Button from '@components/Button'
 import Onboarding from './Onboarding'
@@ -49,28 +49,32 @@ const styles = StyleSheet.create({
   },
 })
 
-const MainPage = (props: Props) => {
+const useViewModel = (props: Props) => {
   const user = useAppSelector((state) => state.user?.user)
   const dispatch = useAppDispatch()
 
-  return user?.onboarded ? (
+  return { ...props, user, dispatch }
+}
+
+const MainPageRoot = (props: ReturnType<typeof useViewModel>) => {
+  return props.user?.onboarded ? (
     <ScreenLayout>
       <View style={{ flex: 1 }}>
         <View style={styles.headerContainer}>
           <View style={styles.userContainer}>
-            <Text style={styles.username}>{user?.name}</Text>
-            <Text style={styles.major}>{user?.major}</Text>
+            <Text style={styles.username}>{props.user?.name}</Text>
+            <Text style={styles.major}>{props.user?.major}</Text>
           </View>
           <Image
             style={styles.userImage}
-            source={{ uri: user?.photoURL }}
+            source={{ uri: props.user?.photoURL }}
             alt="user profile picture"
           />
         </View>
         <ScrollView contentContainerStyle={{ gap: 20 }}>
           <UserYears />
         </ScrollView>
-        <Button onPress={() => dispatch(signOutUser())} color="#039942">
+        <Button onPress={() => props.dispatch(signOutUser())} color="#039942">
           Logout
         </Button>
       </View>
@@ -78,6 +82,11 @@ const MainPage = (props: Props) => {
   ) : (
     <Onboarding />
   )
+}
+
+const MainPage = (props: Props) => {
+  const viewModel = useViewModel(props)
+  return <MainPageRoot {...viewModel} />
 }
 
 export default MainPage

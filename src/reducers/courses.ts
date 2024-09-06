@@ -1,6 +1,7 @@
 import { UnknownAction } from '@reduxjs/toolkit'
 import { BaseState, Error } from '.'
 import * as courses from '@actions/courses'
+import { LOGOUT_USER } from '@actions/user'
 
 // shown in the list of courses in the dashboard
 export type CourseBrief = {
@@ -112,6 +113,8 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
         loading: false,
         error: action.payload as Error,
       }
+    case LOGOUT_USER:
+      return initialState
     default:
       return state
   }

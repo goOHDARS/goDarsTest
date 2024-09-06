@@ -1,6 +1,7 @@
 import { UnknownAction } from '@reduxjs/toolkit'
 import { BaseState, Error } from '.'
 import * as majors from '@actions/majors'
+import { LOGOUT_USER } from '@actions/user'
 
 type Major = {
   id: string
@@ -46,6 +47,11 @@ export default (state = initialState, action: UnknownAction): MajorsState => {
         ...state,
         loading: false,
         error: action.payload as Error,
+      }
+    case LOGOUT_USER:
+      return {
+        ...state,
+        currentMajor: undefined,
       }
     default:
       return state
