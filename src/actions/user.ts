@@ -18,6 +18,8 @@ export const SET_USER_FAILURE = '@@user/SET_USER_FAILURE'
 
 export const CLEAR_USER_ERRORS = '@@user/CLEAR_USER_ERRORS'
 
+export const LOGOUT_USER = '@@user/LOGOUT_USER'
+
 export const getCurrentUser = () => {
   return async (dispatch: AppDispatch) => {
     return authRequestWithDispatch({
@@ -92,7 +94,7 @@ export const signUpUser = (
 
 export const signOutUser = () => {
   return (dispatch: AppDispatch) => {
-    dispatch({ type: GET_USER_SUCCESS, payload: undefined })
+    dispatch({ type: LOGOUT_USER })
     signOut(auth)
   }
 }

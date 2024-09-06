@@ -106,7 +106,9 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
   const [year, setYear] = useState('')
   const errors = useAppSelector((state) => state.user.error)
   const loading = useAppSelector((state) => state.user.loading)
-  const majorsList = useAppSelector((state) => state.majors.list)
+  const { list: majorsList, loading: majorsLoading } = useAppSelector(
+    (state) => state.majors
+  )
 
   const { name, email, password } = route.params
 
@@ -145,6 +147,12 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
     }
   }, [errors, majorsList])
 
+  useEffect(() => {
+    if (!majorsList || majorsList.length === 0) {
+      dispatch(getMajorsList())
+    }
+  }, [])
+
   return (
     <ScreenLayout>
       <Text style={styles.header}>goOHDARS</Text>
@@ -179,6 +187,7 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           closeOnBlur={true}
           closeOnSubmit={false}
           dataSet={currentMajors}
+          loading={majorsLoading}
           direction={Platform.OS === 'ios' ? 'down' : 'up'}
         />
         <AutocompleteDropdown

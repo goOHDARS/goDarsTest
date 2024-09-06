@@ -29,7 +29,7 @@ import {
 } from 'react-native-autocomplete-dropdown'
 import { HelpCircle, Info, Search } from 'react-native-feather'
 import { CourseBrief, UserCourse } from 'src/reducers/courses'
-import _, { debounce } from 'lodash'
+import _ from 'lodash'
 
 export default () => {
   const dispatch = useAppDispatch()
@@ -69,23 +69,21 @@ export default () => {
         )[0]
       )
     ) {
-      setSelectedCourses([...selectedCourses, selectedCourse])
+      setSelectedCourses((prev) => [...prev, selectedCourse])
       setAdded(selectedCourse)
       setCredits(credits + selectedCourse.credits)
       setIsVisible(true)
     } else if (selectedCourse) {
-      setSelectedCourses(
-        selectedCourses.filter(
-          (course) => course.shortName !== selectedCourse.shortName
-        )
+      setSelectedCourses((prev) =>
+        prev.filter((course) => course.shortName !== selectedCourse.shortName)
       )
     }
   }
 
-  const handleUndoCourse = (courseParam: CourseBrief | undefined) => {
+  const handleUndoCourse = (courseParam?: CourseBrief) => {
     if (courseParam) {
-      setSelectedCourses(
-        selectedCourses
+      setSelectedCourses((prev) =>
+        prev
           ?.filter((course) => course.shortName !== courseParam.shortName)
           .sort()
       )
@@ -220,8 +218,8 @@ export default () => {
   }, [added])
 
   useEffect(() => {
-    if (courses !== undefined) {
-      const except = courses?.filter(
+    if (courses) {
+      const except = courses.filter(
         (course) =>
           !selectedCourses.some(
             (selectedCourses) => selectedCourses.shortName === course.shortName
@@ -230,7 +228,7 @@ export default () => {
 
       if (except) {
         setDataSet(
-          except?.map((course, index) => {
+          except.map((course, index) => {
             return {
               key: index,
               id: course.id,
@@ -244,8 +242,7 @@ export default () => {
 
   useEffect(() => {
     if (
-      initialCourses === null ||
-      initialCourses === undefined ||
+      !initialCourses ||
       initialCourses.length === 0 ||
       !Array.isArray(initialCourses)
     ) {
@@ -257,7 +254,7 @@ export default () => {
       )
       setInitialized(true)
     }
-  })
+  }, [initialCourses])
 
   return (
     <ScreenLayout style={{ justifyContent: 'space-between' }}>

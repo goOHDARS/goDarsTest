@@ -1,6 +1,7 @@
 import { UnknownAction } from '@reduxjs/toolkit'
 import { BaseState, Error } from '.'
 import * as conversations from '../actions/conversations'
+import { LOGOUT_USER } from '@actions/user'
 
 export type Message = {
   role: 'user' | 'assistant' | 'system' | 'tool'
@@ -61,6 +62,8 @@ export default (
         loading: false,
         error: action.payload as Error,
       }
+    case LOGOUT_USER:
+      return initialState
     default:
       return state
   }

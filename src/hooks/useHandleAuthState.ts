@@ -4,6 +4,7 @@ import { useAppDispatch } from './store'
 import { getCurrentUser } from '@actions/user'
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'
 import { getMajorsList } from '@actions/majors'
+import { getCourses } from '@actions/courses'
 
 const useHandleAuthState = () => {
   const dispatch = useAppDispatch()
@@ -23,6 +24,7 @@ const useHandleAuthState = () => {
 
       if (user && user.displayName) {
         await dispatch(getCurrentUser())
+        await dispatch(getCourses())
         setLoaded(true)
       } else {
         setLoaded(true)
