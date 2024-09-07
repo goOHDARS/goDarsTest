@@ -4,8 +4,8 @@ import SignUpScreen from './SignUpScreen'
 import AdditionalInfoScreen from './AdditionalInfoScreen'
 import SignInScreen from './SignInScreen'
 import { useEffect, useState } from 'react'
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'
 import FullScreenLoader from '@components/FullScreenLoader'
+import { getKey } from '@utils/storage'
 
 export type RootUnauthenticatedStackParamList = {
   '/landing': undefined
@@ -22,7 +22,7 @@ const UnauthenticatedRoot = () => {
     useState<keyof RootUnauthenticatedStackParamList>()
 
   useEffect(() => {
-    ReactNativeAsyncStorage.getItem('has_visited').then((hasVisited) => {
+    getKey('has_visited').then((hasVisited) => {
       setInitialRouteName(hasVisited ? '/signin' : '/landing')
     })
   }, [])

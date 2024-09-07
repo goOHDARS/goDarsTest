@@ -4,7 +4,7 @@ import ScreenLayout from '@components/ScreenLayout'
 import Button from '@components/Button'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootUnauthenticatedStackParamList } from '.'
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'
+import { setKey } from '@utils/storage'
 
 const styles = StyleSheet.create({
   header: {
@@ -27,7 +27,7 @@ type Props = NativeStackScreenProps<
 
 const LandingScreen = ({ navigation }: Props) => {
   const handlePress = () => {
-    ReactNativeAsyncStorage.setItem('has_visited', 'true')
+    setKey('has_visited')
     navigation.push('/signup')
   }
 

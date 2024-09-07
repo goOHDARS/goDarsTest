@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useAppDispatch, useAppSelector } from './store'
 import { getCurrentUser, setLoggedIn } from '@actions/user'
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'
 import { getMajorsList } from '@actions/majors'
 import { getCourses } from '@actions/courses'
+import { getKey } from '@utils/storage'
 
 export enum AppState {
   Loading,
@@ -46,7 +46,7 @@ const useInitialDataLoader = () => {
 
   useEffect(() => {
     const fetchIndependentData = async () => {
-      const loggedInKey = await ReactNativeAsyncStorage.getItem('logged_in')
+      const loggedInKey = await getKey('logged_in')
 
       // fetch data not dependent on user
       await dispatch(getMajorsList())
