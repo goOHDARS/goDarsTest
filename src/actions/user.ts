@@ -16,6 +16,8 @@ export const SET_USER_REQUEST = '@@user/SET_USER_REQUEST'
 export const SET_USER_SUCCESS = '@@user/SET_USER_SUCCESS'
 export const SET_USER_FAILURE = '@@user/SET_USER_FAILURE'
 
+export const SET_LOGGED_IN = '@@user/SET_LOGGED_IN'
+
 export const CLEAR_USER_ERRORS = '@@user/CLEAR_USER_ERRORS'
 
 export const LOGOUT_USER = '@@user/LOGOUT_USER'
@@ -35,6 +37,7 @@ export const signInUser = (email: string, password: string) => {
     dispatch({ type: GET_USER_REQUEST })
     try {
       await signInWithEmailAndPassword(auth, email, password)
+      dispatch(setLoggedIn())
     } catch (err: any) {
       dispatch({
         type: GET_USER_FAILURE,
@@ -65,6 +68,7 @@ export const signUpUser = (
         password
       )
       await updateProfile(userPromise.user, { displayName: name })
+      dispatch(setLoggedIn())
     } catch (err: any) {
       dispatch({
         type: SET_USER_FAILURE,
@@ -97,6 +101,10 @@ export const signOutUser = () => {
     dispatch({ type: LOGOUT_USER })
     signOut(auth)
   }
+}
+
+export const setLoggedIn = () => {
+  return { type: SET_LOGGED_IN }
 }
 
 export const resetUserErrors = () => {

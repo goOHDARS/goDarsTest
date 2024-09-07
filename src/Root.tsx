@@ -1,27 +1,16 @@
-import useHandleAuthState from '@hooks/useHandleAuthState'
+import useInitialDataLoader, { AppState } from '@hooks/useInitialDataLoader'
 import UnauthenticatedRoot from './unauthenticated'
 import AuthenticatedRoot from './authenticated'
-import { useAppSelector } from '@hooks/store'
 import FullScreenLoader from '@components/FullScreenLoader'
 
 const Root = () => {
-  const user = useAppSelector((state) => state.user.user)
+  const mode = useInitialDataLoader()
 
-  const { loaded, firstTimeUser } = useHandleAuthState()
-
-  return (
-    <>
-      {loaded ? (
-        user ? (
-          <AuthenticatedRoot />
-        ) : (
-          <UnauthenticatedRoot firstTimeUser={firstTimeUser} />
-        )
-      ) : (
-        <FullScreenLoader />
-      )}
-    </>
-  )
+  return {
+    [AppState.Loading]: <FullScreenLoader />,
+    [AppState.Authenticated]: <AuthenticatedRoot />,
+    [AppState.Unauthenticated]: <UnauthenticatedRoot />,
+  }[mode]
 }
 
 export default Root

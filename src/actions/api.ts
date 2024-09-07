@@ -61,6 +61,7 @@ export const authRequestWithDispatch = async ({
   data,
   headers = { 'Content-Type': 'application/json' },
 }: RequestWithDispatchParams) => {
+  await auth.authStateReady()
   const userToken = await auth.currentUser?.getIdToken()
 
   const combinedHeaders = { ...headers, Authorization: `Bearer ${userToken}` }

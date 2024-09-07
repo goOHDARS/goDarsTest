@@ -1,6 +1,7 @@
 import { UnknownAction } from '@reduxjs/toolkit'
 import * as user from '@actions/user'
 import { BaseState, Error } from '.'
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage'
 
 type User = {
   id: string
@@ -16,10 +17,12 @@ type User = {
 
 type UserState = BaseState & {
   user?: User
+  loggedIn: boolean
 }
 
 const initialState: UserState = {
   loading: false,
+  loggedIn: false,
 }
 
 export default (state = initialState, action: UnknownAction): UserState => {
@@ -50,7 +53,14 @@ export default (state = initialState, action: UnknownAction): UserState => {
         ...state,
         error: undefined,
       }
+    case user.SET_LOGGED_IN:
+      ReactNativeAsyncStorage.setItem('logged_in', 'true')
+      return {
+        ...state,
+        loggedIn: true,
+      }
     case user.LOGOUT_USER:
+      ReactNativeAsyncStorage.removeItem('logged_in')
       return initialState
     default:
       return state
