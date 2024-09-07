@@ -3,7 +3,13 @@ import ScreenLayout from '@components/ScreenLayout'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootUnauthenticatedStackParamList } from '.'
 import React, { useState } from 'react'
-import { Text, TextInput, StyleSheet, View, TouchableOpacity } from 'react-native'
+import {
+  Text,
+  TextInput,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+} from 'react-native'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { resetUserErrors } from '@actions/user'
 import { Eye } from 'react-native-feather'
@@ -112,6 +118,11 @@ const SignUpScreen = ({ navigation }: Props) => {
     })
   }
 
+  const handleLinkPress = () => {
+    dispatch(resetUserErrors())
+    navigation.push('/signin')
+  }
+
   return (
     <ScreenLayout style={{ justifyContent: 'flex-start' }}>
       <Text style={styles.header}>goOHDARS</Text>
@@ -149,12 +160,25 @@ const SignUpScreen = ({ navigation }: Props) => {
             autoCorrect={false}
             secureTextEntry={!showPassword}
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}
-            style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center',
-              alignItems: 'center', height: 50, width: '15%', borderTopRightRadius: 10,
-              borderBottomRightRadius: 10}}>
-            {password ? <Eye color={'black'} strokeWidth={1} width={20} ></Eye> : null}
-            <Text style={{ fontSize: 11}}>{password ? !showPassword ? 'show' : 'hide' : null}</Text>
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: 50,
+              width: '15%',
+              borderTopRightRadius: 10,
+              borderBottomRightRadius: 10,
+            }}
+          >
+            {password ? (
+              <Eye color={'black'} strokeWidth={1} width={20}></Eye>
+            ) : null}
+            <Text style={{ fontSize: 11 }}>
+              {password ? (!showPassword ? 'show' : 'hide') : null}
+            </Text>
           </TouchableOpacity>
         </View>
         {errors && (
@@ -172,7 +196,6 @@ const SignUpScreen = ({ navigation }: Props) => {
             !password.match(/[^A-Za-z0-9]/) ||
             !password.match(/[A-Z]/) ||
             !password.match(/[0-9]/)
-
           }
           fullWidth
           onPress={handlePress}
@@ -181,11 +204,7 @@ const SignUpScreen = ({ navigation }: Props) => {
         </Button>
         <View style={styles.linkArea}>
           <Text style={{ fontSize: 18 }}>Already have an account?</Text>
-          <Button
-            style={{ marginLeft: 10 }}
-            noFill
-            onPress={() => navigation.push('/signin')}
-          >
+          <Button style={{ marginLeft: 10 }} noFill onPress={handleLinkPress}>
             Sign In
           </Button>
         </View>

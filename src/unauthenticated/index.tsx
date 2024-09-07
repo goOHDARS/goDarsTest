@@ -22,7 +22,8 @@ const UnauthenticatedRoot = () => {
     useState<keyof RootUnauthenticatedStackParamList>()
 
   useEffect(() => {
-    getKey('has_visited').then((hasVisited) => {
+    getKey('has_visited').then(async (hasVisited) => {
+      await new Promise((resolve) => setTimeout(resolve, 250))
       setInitialRouteName(hasVisited ? '/signin' : '/landing')
     })
   }, [])

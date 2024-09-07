@@ -19,7 +19,7 @@ const useInitialDataLoader = () => {
 
   const getMode = () => {
     if (loaded) {
-      return loggedIn ? AppState.Authenticated : AppState.Unauthenticated
+      return userLoaded ? AppState.Authenticated : AppState.Unauthenticated
     }
 
     return AppState.Loading

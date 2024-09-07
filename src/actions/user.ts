@@ -37,7 +37,6 @@ export const signInUser = (email: string, password: string) => {
     dispatch({ type: GET_USER_REQUEST })
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      dispatch(setLoggedIn())
     } catch (err: any) {
       dispatch({
         type: GET_USER_FAILURE,
@@ -46,8 +45,10 @@ export const signInUser = (email: string, password: string) => {
           status: 500,
         },
       })
+      return
     }
-    return
+
+    return dispatch(setLoggedIn())
   }
 }
 
@@ -68,7 +69,6 @@ export const signUpUser = (
         password
       )
       await updateProfile(userPromise.user, { displayName: name })
-      dispatch(setLoggedIn())
     } catch (err: any) {
       dispatch({
         type: SET_USER_FAILURE,
@@ -80,7 +80,7 @@ export const signUpUser = (
       return
     }
 
-    return authRequestWithDispatch({
+    await authRequestWithDispatch({
       dispatch,
       endpoint: 'create_user',
       method: 'POST',
@@ -93,6 +93,8 @@ export const signUpUser = (
         startingSemester,
       },
     })
+
+    return dispatch(setLoggedIn())
   }
 }
 

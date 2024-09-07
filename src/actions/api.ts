@@ -36,6 +36,14 @@ export const requestWithDispatch = async ({
       return
     }
 
+    if (response.status === 403) {
+      dispatch({
+        type: '@@user/GET_USER_FAILURE',
+        payload: { message: 'Token expired', status: 403 },
+      })
+      dispatch({ type: '@@user/LOGOUT_USER' })
+    }
+
     const errorData = await response.json()
     console.log(`request failure: ${errorData.error}`)
     dispatch({
