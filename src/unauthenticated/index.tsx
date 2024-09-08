@@ -3,10 +3,9 @@ import LandingScreen from './LandingScreen'
 import SignUpScreen from './SignUpScreen'
 import AdditionalInfoScreen from './AdditionalInfoScreen'
 import SignInScreen from './SignInScreen'
-import { useAppSelector } from '@hooks/store'
-import { useEffect } from 'react'
-import Onboarding from '../authenticated/Onboarding'
-import { CourseBrief } from 'src/reducers/courses'
+import { useEffect, useState } from 'react'
+import FullScreenLoader from '@components/FullScreenLoader'
+import { getKey } from '@utils/storage'
 
 export type RootUnauthenticatedStackParamList = {
   '/landing': undefined
@@ -18,12 +17,20 @@ export type RootUnauthenticatedStackParamList = {
 const UnauthenticatedStack =
   createNativeStackNavigator<RootUnauthenticatedStackParamList>()
 
-type Props = {
-  firstTimeUser: boolean
-}
+const UnauthenticatedRoot = () => {
+  const [initialRouteName, setInitialRouteName] =
+    useState<keyof RootUnauthenticatedStackParamList>()
 
-const UnauthenticatedRoot = ({ firstTimeUser }: Props) => {
-  const initialRouteName = firstTimeUser ? '/landing' : '/signin'
+  useEffect(() => {
+    getKey('has_visited').then(async (hasVisited) => {
+      await new Promise((resolve) => setTimeout(resolve, 250))
+      setInitialRouteName(hasVisited ? '/signin' : '/landing')
+    })
+  }, [])
+
+  if (!initialRouteName) {
+    return <FullScreenLoader />
+  }
 
   return (
     <UnauthenticatedStack.Navigator

@@ -5,7 +5,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import React, { useState } from 'react'
 import { Text, TextInput, StyleSheet, View } from 'react-native'
 import { RootUnauthenticatedStackParamList } from '.'
-import { signInUser } from '@actions/user'
+import { resetUserErrors, signInUser } from '@actions/user'
 
 const styles = StyleSheet.create({
   container: {
@@ -72,6 +72,11 @@ const SignInScreen = ({ navigation }: Props) => {
     dispatch(signInUser(email, password))
   }
 
+  const handleLinkPress = () => {
+    dispatch(resetUserErrors())
+    navigation.push('/signup')
+  }
+
   return (
     <ScreenLayout style={styles.container}>
       <Text style={styles.header}>goOHDARS</Text>
@@ -113,11 +118,7 @@ const SignInScreen = ({ navigation }: Props) => {
         </Button>
         <View style={styles.linkArea}>
           <Text style={{ fontSize: 18 }}>Don't have an account?</Text>
-          <Button
-            style={{ marginLeft: 10 }}
-            noFill
-            onPress={() => navigation.push('/signup')}
-          >
+          <Button style={{ marginLeft: 10 }} noFill onPress={handleLinkPress}>
             Sign Up
           </Button>
         </View>

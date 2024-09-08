@@ -4,6 +4,7 @@ import ScreenLayout from '@components/ScreenLayout'
 import Button from '@components/Button'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootUnauthenticatedStackParamList } from '.'
+import { setKey } from '@utils/storage'
 
 const styles = StyleSheet.create({
   header: {
@@ -26,6 +27,7 @@ type Props = NativeStackScreenProps<
 
 const LandingScreen = ({ navigation }: Props) => {
   const handlePress = () => {
+    setKey('has_visited')
     navigation.push('/signup')
   }
 
