@@ -1,8 +1,8 @@
 import {
   GET_COURSES_SUCCESS,
   getInitialCourses,
-  QUERY_COURSES_SUCCESS,
   queryCourses,
+  resetQueryCourses,
   setInitialCourses,
 } from '@actions/courses'
 import { getCurrentUser } from '@actions/user'
@@ -11,7 +11,7 @@ import ScreenLayout from '@components/ScreenLayout'
 import SelectedCourses from '@components/SelectedCourses'
 import Snackbar from '@components/Snackbar'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ import {
 } from 'react-native'
 import {
   AutocompleteDropdown,
+  AutocompleteDropdownRef,
   TAutocompleteDropdownItem,
 } from 'react-native-autocomplete-dropdown'
 import { HelpCircle, Info, Search } from 'react-native-feather'
@@ -33,46 +34,56 @@ import _ from 'lodash'
 
 export default () => {
   const dispatch = useAppDispatch()
-
   const initialCourses = useAppSelector((state) => state.courses.courses)
   const user = useAppSelector((state) => state.user.user)
-  const courses = useAppSelector((state) => state.courses.queryResults)
+  const queriedCourses = useAppSelector((state) => state.courses.queryResults)
   const coursesLoading = useAppSelector((state) => state.courses.loading)
   const major = useAppSelector((state) => state.majors.currentMajor)
-  const loading = useAppSelector((state) => state.user.loading)
+  const userLoading = useAppSelector((state) => state.user.loading)
 
-  const [added, setAdded] = useState<CourseBrief>()
   const [isVisible, setIsVisible] = useState(false)
-
   const [credits, setCredits] = useState(0.0)
   const [selectedCourses, setSelectedCourses] = useState<CourseBrief[]>([])
-
   const [modalVisible, setModalVisible] = useState(false)
-
-  const [dataSet, setDataSet] = useState<TAutocompleteDropdownItem[]>([])
-  const [query, setQuery] = useState('')
-
   const [initialized, setInitialized] = useState(false)
+  const dropdowncontroller = useRef<AutocompleteDropdownRef>()
+
+  const dropdownData = useMemo(
+    () =>
+      queriedCourses
+        ?.filter(
+          (course) =>
+            !selectedCourses.find(
+              (selectedCourse) => selectedCourse.shortName === course.shortName
+            )
+        )
+        .map((course, index) => ({
+          key: index,
+          id: course.id,
+          title: course.shortName,
+        })) ?? [],
+    [queriedCourses, selectedCourses]
+  )
 
   const handleSelectCourse = (courseParam: TAutocompleteDropdownItem) => {
     if (!courseParam || !courseParam.title) return
 
-    const selectedCourse = courses?.find(
+    const selectedCourse = queriedCourses?.find(
       (course) => course.shortName === courseParam.title
     )
 
     if (
       selectedCourse &&
-      !selectedCourses.includes(
-        selectedCourses.filter(
-          (course) => course.shortName === selectedCourse.shortName
-        )[0]
+      !selectedCourses.find(
+        (course) => course.shortName === selectedCourse.shortName
       )
     ) {
       setSelectedCourses((prev) => [...prev, selectedCourse])
-      setAdded(selectedCourse)
+      dispatch(resetQueryCourses())
+      dropdowncontroller.current?.clear()
       setCredits(credits + selectedCourse.credits)
       setIsVisible(true)
+      setTimeout(() => setIsVisible(false), 3000)
     } else if (selectedCourse) {
       setSelectedCourses((prev) =>
         prev.filter((course) => course.shortName !== selectedCourse.shortName)
@@ -88,23 +99,6 @@ export default () => {
           .sort()
       )
       setCredits(credits - courseParam?.credits)
-    }
-  }
-
-  const debouncedQuery = _.debounce((query: string) => {
-    dispatch(queryCourses(query))
-  }, 600)
-
-  const handleSetQuery = (e: string) => {
-    setQuery(e)
-    if (query.length >= 3) {
-      debouncedQuery(query)
-      return
-    } else if (query.length < 3) {
-      dispatch({
-        type: QUERY_COURSES_SUCCESS,
-        payload: [],
-      })
     }
   }
 
@@ -128,15 +122,14 @@ export default () => {
       ]
     )
   }
+
   const handleFinalFinishAccount = async () => {
-    const omitArr: Omit<UserCourse, 'id'>[] = selectedCourses.map((course) => {
-      return {
-        course: course.shortName,
-        semester: course.semester ?? 0,
-        category: course.category ?? '',
-        subcategory: course.subcategory,
-      }
-    })
+    const omitArr: Omit<UserCourse, 'id'>[] = selectedCourses.map((course) => ({
+      course: course.shortName,
+      semester: course.semester ?? 0,
+      category: course.category ?? '',
+      subcategory: course.subcategory,
+    }))
     // There were some promise resolution issues with the following two lines
     await dispatch(setInitialCourses(omitArr))
     await dispatch(getCurrentUser())
@@ -145,6 +138,15 @@ export default () => {
       payload: selectedCourses,
     })
   }
+
+  const handleSetQuery = (e: string) => {
+    if (e.length === 3 && dropdownData.length === 0) {
+      dispatch(queryCourses(e))
+    } else if (e.length < 3) {
+      dispatch(resetQueryCourses())
+    }
+  }
+
   const handleEditSemester = (
     changedCourse: CourseBrief,
     newSemester: string
@@ -180,66 +182,6 @@ export default () => {
     }
   }
 
-  const handleEditSemesters = () => {
-    setModalVisible(true)
-  }
-
-  useEffect(() => {
-    if (isVisible) {
-      const timeout = setTimeout(() => {
-        setIsVisible(false)
-      }, 3000)
-
-      return () => clearTimeout(timeout)
-    }
-  }, [isVisible])
-
-  useEffect(() => {
-    if (added && courses) {
-      const except = courses?.filter(
-        (course) =>
-          !selectedCourses.some(
-            (selectedCourses) => selectedCourses.shortName === course.shortName
-          )
-      )
-
-      if (except) {
-        setDataSet(
-          except?.map((course, index) => {
-            return {
-              key: index,
-              id: course.id,
-              title: course.shortName,
-            }
-          })
-        )
-      }
-    }
-  }, [added])
-
-  useEffect(() => {
-    if (courses) {
-      const except = courses.filter(
-        (course) =>
-          !selectedCourses.some(
-            (selectedCourses) => selectedCourses.shortName === course.shortName
-          )
-      )
-
-      if (except) {
-        setDataSet(
-          except.map((course, index) => {
-            return {
-              key: index,
-              id: course.id,
-              title: course.shortName,
-            }
-          })
-        )
-      }
-    }
-  }, [courses])
-
   useEffect(() => {
     if (
       !initialCourses ||
@@ -268,11 +210,15 @@ export default () => {
         }}
       >
         <Snackbar
-          message={'Added ' + added?.shortName + ' to clipboard'}
+          message={
+            'Added ' +
+            selectedCourses[selectedCourses.length - 1]?.shortName +
+            ' to clipboard'
+          }
           visible={isVisible}
           actionText="UNDO"
           onActionPress={() => {
-            handleUndoCourse(added)
+            handleUndoCourse(selectedCourses[selectedCourses.length - 1])
           }}
         />
         <View style={styles.headerContainer}>
@@ -285,8 +231,11 @@ export default () => {
               <Search color={'#ffffff'} strokeWidth={3}></Search>
             </View>
             <AutocompleteDropdown
+              controller={(controller) => {
+                dropdowncontroller.current = controller
+              }}
               loading={coursesLoading}
-              onChangeText={(e) => handleSetQuery(e)}
+              onChangeText={handleSetQuery}
               containerStyle={styles.textBoxInput}
               textInputProps={{
                 style: styles.dropDownText,
@@ -295,20 +244,18 @@ export default () => {
               }}
               inputContainerStyle={styles.dropDownInput}
               rightButtonsContainerStyle={{ height: 50 }}
-              onSelectItem={(course) => {
-                handleSelectCourse(course)
-              }}
+              onSelectItem={handleSelectCourse}
               showClear={false}
               clearOnFocus={true}
+              onFocus={() => dispatch(resetQueryCourses())}
               closeOnBlur={true}
               useFilter={true}
               suggestionsListMaxHeight={500}
               closeOnSubmit={false}
-              dataSet={dataSet}
+              dataSet={dropdownData}
               direction={Platform.select({ ios: 'down' })}
               emptyResultText="No course found with that name or course already in list."
               suggestionsListContainerStyle={{
-                height: 275,
                 width: '110%',
                 backgroundColor: 'white',
                 justifyContent: 'center',
@@ -346,14 +293,11 @@ export default () => {
         indicatorStyle="black"
       >
         <SelectedCourses
-          courses={courses ?? []}
-          dataSet={dataSet}
-          setDataSet={setDataSet}
           credits={credits}
           setCredits={setCredits}
           setSelectedCourses={setSelectedCourses}
           selectedCourses={selectedCourses}
-        ></SelectedCourses>
+        />
       </ScrollView>
       <View
         style={{
@@ -398,7 +342,7 @@ export default () => {
         <Button
           disabled={selectedCourses.length === 0}
           fullWidth
-          onPress={handleEditSemesters}
+          onPress={() => setModalVisible(true)}
         >
           Edit Semesters
         </Button>
@@ -528,7 +472,7 @@ export default () => {
                 }
                 fullWidth
                 onPress={handleContinuePress}
-                loading={loading}
+                loading={userLoading}
               >
                 Finish Account
               </Button>

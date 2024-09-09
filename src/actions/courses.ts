@@ -123,3 +123,7 @@ export const getCourseInfo = (courseName: string) => {
     })
   }
 }
+
+export const resetQueryCourses = () => {
+  return { type: QUERY_COURSES_SUCCESS, payload: undefined }
+}
