@@ -5,6 +5,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Alert,
 } from 'react-native'
 import { Archive, HelpCircle, LogOut, User, X } from 'react-native-feather'
 import { signOutUser } from '@actions/user'
@@ -140,7 +141,18 @@ viewWhatIfDARS: boolean, setViewWhatIfDARS: React.Dispatch<React.SetStateAction<
               <Text style={{ color: '#039942', fontWeight: '700' }}>What if DARS?</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
-              setViewExtras(false), dispatch(signOutUser())
+              setViewExtras(false), Alert.alert('goOHDARS', 'Are you sure you want to sign out?', [
+                {
+                  text: 'Cancel',
+                  style: 'destructive',
+                },
+                {
+                  text: 'Confirm',
+                  onPress: () => {
+                    dispatch(signOutUser())
+                  },
+                },
+              ])
             }} style={styles.innerModalContainer}>
               <LogOut color={'red'} width={25} height={25} strokeWidth={3}></LogOut>
               <Text style={{ fontSize: 16, fontWeight: '600', color: 'red'}}>Sign Out</Text>

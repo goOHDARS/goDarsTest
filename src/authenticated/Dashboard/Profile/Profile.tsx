@@ -2,7 +2,6 @@ import { deleteAccount, GET_USER_REQUEST, sendResetPassEmail, SET_USER_SUCCESS, 
 import ScreenLayout from '@components/ScreenLayout'
 import { Modal, View, TouchableOpacity, Text, Image, Alert } from 'react-native'
 import { Edit2, Trash2 } from 'react-native-feather'
-import user from 'src/reducers/user'
 import ProfileCustomizer, { pokeResponse } from './ProfileCustomizer'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { useState } from 'react'
@@ -137,7 +136,7 @@ export default (
           <Text style={{fontSize: 34, fontWeight: '100', textTransform: 'capitalize', marginLeft: '10%', marginBottom: '2.5%'}}>{user?.name}</Text>
           <View style={{ display: 'flex', flexDirection: 'column', marginLeft: '10%' }}>
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
-              <Text style={{ fontSize: 24, fontWeight: '200' }}>{years.has(Math.floor(user.semester / 2) + 1) ? years.get(Math.floor(user.semester / 2) + 1) : user.semester}</Text>
+              <Text style={{ fontSize: 24, fontWeight: '200' }}>{years.has(Math.floor(user?.semester / 2) + 1) ? years.get(Math.floor(user?.semester / 2) + 1) : user?.semester}</Text>
               <Text style={{ fontWeight: '100', fontSize: 12 }}>  in  </Text>
               <Text style={{fontSize: 20, fontWeight: '200', textTransform: 'capitalize'}}>{user?.major}</Text>
             </View>

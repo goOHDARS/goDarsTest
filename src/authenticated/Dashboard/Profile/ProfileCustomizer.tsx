@@ -1,12 +1,10 @@
 import RNModal from 'react-native-modal'
 import ColorPicker, { Panel1, Swatches, Preview, HueSlider } from 'reanimated-color-picker'
-import { signOut, updateProfile } from 'firebase/auth'
-import { CourseBrief } from 'src/reducers/courses'
 import { ActivityIndicator, Alert, Animated, FlatList, Keyboard, Pressable, TextInput, Image, Modal, View, Text, TouchableOpacity } from 'react-native'
 import { useEffect, useRef, useState } from 'react'
 import ScreenLayout from '@components/ScreenLayout'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
-import { GET_USER_REQUEST, getCurrentUser, SET_USER_SUCCESS, updateUser } from '@actions/user'
+import { getCurrentUser, SET_USER_SUCCESS, updateUser } from '@actions/user'
 import { X, Search, XCircle } from 'react-native-feather'
 import { styles } from './styles'
 import Button from '@components/Button'
@@ -117,6 +115,7 @@ export default (
     if (hasChanges) {
       console.log('semester: ', user.semester)
       dispatch(updateUser(user))
+      dispatch(getCurrentUser())
     }
   }
 
