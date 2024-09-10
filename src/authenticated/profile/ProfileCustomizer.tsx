@@ -1,12 +1,12 @@
 import RNModal from 'react-native-modal'
 import ColorPicker, { Panel1, Swatches, Preview, HueSlider } from 'reanimated-color-picker'
-import { signOut } from 'firebase/auth'
+import { signOut, updateProfile } from 'firebase/auth'
 import { CourseBrief } from 'src/reducers/courses'
 import { ActivityIndicator, Alert, Animated, FlatList, Keyboard, Pressable, TextInput, Image, Modal, View, Text, TouchableOpacity } from 'react-native'
 import { useEffect, useRef, useState } from 'react'
 import ScreenLayout from '@components/ScreenLayout'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
-import { GET_USER_REQUEST, SET_USER_SUCCESS } from '@actions/user'
+import { GET_USER_REQUEST, getCurrentUser, SET_USER_SUCCESS, updateUser } from '@actions/user'
 import { X, Search, XCircle } from 'react-native-feather'
 import { styles } from './styles'
 import Button from '@components/Button'
@@ -33,18 +33,15 @@ export default (
   const [isVisible, setIsVisible] = useState(false)
   const [colorPicked, setColorPicked] = useState<any>()
 
+  const [hasChanges, setHasChanges] = useState(false)
+
   const autoCompleteDropDownRef: React.LegacyRef<TextInput> = useRef(null)
   const opacity = useRef(new Animated.Value(0)).current
 
   const loading = useAppSelector((state) => state.user.loading)
 
-  const saveChanges = () => {
-    dispatch({
-      type: SET_USER_SUCCESS,
-      payload: {
-        ...user,
-      },
-    })
+  if (!user) {
+    return null
   }
 
   const handleSelectColor = ({hex} : any) => {
@@ -57,6 +54,7 @@ export default (
         },
       })
       console.log(hex)
+      setHasChanges(true)
     }
   }
 
@@ -115,6 +113,13 @@ export default (
     }
   }
 
+  const handleUpdateUser = () => {
+    if (hasChanges) {
+      console.log('semester: ', user.semester)
+      dispatch(updateUser(user))
+    }
+  }
+
   return (
     <RNModal
       backdropTransitionOutTiming={450}
@@ -125,7 +130,7 @@ export default (
         setViewProfileCustomizer(false)
       }}
       onBackdropPress={() => {
-        Keyboard.dismiss(), setViewProfileCustomizer(false), console.log('backdrop press')
+        Keyboard.dismiss(), setViewProfileCustomizer(false), handleUpdateUser()
       }}
       animationIn={'slideInUp'}
       animationOut={'slideOutDown'}
@@ -185,7 +190,7 @@ export default (
               {/* <AutocompleteDropdown
                 onChangeText={(e) => handleSetQuery(e)}
                 ref={autoCompleteDropDownRef}
-                onFocus={autoCompleteDropDownRef.current?.isFocused ? () => {setSearching(true), console.log('focused')} : () => {setSearching(false), console.log('not focused')}}
+                onFocus={autoCompleteDropDownRef.current?.isFocsused ? () => {setSearching(true), console.log('focused')} : () => {setSearching(false), console.log('not focused')}}
                 containerStyle={styles.textBoxInput}
                 textInputProps={{
                   style: styles.dropDownText,
@@ -229,7 +234,7 @@ export default (
                       dispatch({type: SET_USER_SUCCESS, payload: {
                         ...user,
                         photoURL: item.url,
-                      }}), updatePokeData(item), setSearching(false)
+                      }}), updatePokeData(item), setSearching(false), setHasChanges(true)
                     }} style={{ width: '33%', display: 'flex', flexDirection: 'column', alignItems: 'center'}} key={index}>
                       <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 80, height: 80, borderRadius: 100, borderWidth: 1, borderColor: (index === 0 ? user?.borderURLColor : 'black')}}>
                         <Image

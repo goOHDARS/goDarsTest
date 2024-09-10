@@ -23,6 +23,7 @@ export const requestWithDispatch = async ({
 
   try {
     console.log(`starting request: ${endpoint}`)
+    console.log(JSON.stringify(data))
     dispatch({ type: request })
     const response = await fetch(`${API_URL}/${endpoint}`, {
       method,

@@ -2,8 +2,8 @@ import { StyleSheet } from 'react-native'
 
 export const styles = StyleSheet.create({
   title: {
-    fontSize: 30,
-    fontWeight: '100',
+    fontSize: 25,
+    fontWeight: '200',
   },
   semesterContainer: {
     display: 'flex',
@@ -12,14 +12,9 @@ export const styles = StyleSheet.create({
     width: '50%',
     gap: 20,
   },
-  fallSemesterText: {
+  semesterTakenText: {
     fontSize: 13,
-    fontWeight: '200',
-    color: 'white',
-  },
-  springSemesterText: {
-    fontSize: 13,
-    fontWeight: '200',
+    fontWeight: '300',
     color: 'white',
   },
   semesterInnerText: {

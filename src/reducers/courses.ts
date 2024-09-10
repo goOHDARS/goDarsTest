@@ -63,8 +63,8 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
         ...state,
         loading: false,
         courses: action.payload as CourseBrief[],
-        totalCredits: (action.payload as CourseBrief[]).reduce((acc, course) => {
-          return acc + course.credits
+        totalCredits: (action.payload as CourseBrief[]).reduce((accum, course) => {
+          return accum + course.credits
         }, 0),
         error: undefined,
       }

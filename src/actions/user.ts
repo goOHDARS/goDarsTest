@@ -1,5 +1,6 @@
 import { authRequestWithDispatch } from './api'
 import {
+  sendPasswordResetEmail,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
@@ -7,6 +8,7 @@ import {
 } from 'firebase/auth'
 import { auth } from '@configs/firebase'
 import { AppDispatch } from '../store'
+import { User } from 'src/reducers/user'
 
 export const GET_USER_REQUEST = '@@user/GET_USER_REQUEST'
 export const GET_USER_SUCCESS = '@@user/GET_USER_SUCCESS'
@@ -98,6 +100,58 @@ export const signUpUser = (
   }
 }
 
+export const deleteAccount = () => {
+  return async (dispatch: AppDispatch) => {
+    return authRequestWithDispatch({
+      dispatch,
+      method: 'DELETE',
+      endpoint: 'clear_test_users',
+      types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
+    })
+  }
+}
+
+export const sendResetPassEmail = (email: string) => {
+  return async (dispatch: AppDispatch) => {
+    dispatch({ type: SET_USER_REQUEST })
+    try {
+      await sendPasswordResetEmail(auth, email)
+      dispatch({ type: SET_USER_SUCCESS })
+    } catch (error: any) {
+      dispatch({ type: SET_USER_FAILURE, payload: error })
+    }
+  }
+}
+
+export const updateUser = (userInfo: User) => {
+  console.log(userInfo.semester)
+
+  return async (dispatch: AppDispatch) => {
+    dispatch({ type: SET_USER_REQUEST })
+    try {
+      await authRequestWithDispatch({
+        dispatch,
+        endpoint: 'update_user',
+        method: 'PATCH',
+        types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
+        data: {
+          ...userInfo,
+          startingSemester: userInfo.semester,
+        },
+      })
+      // dispatch({ type: SET_USER_SUCCESS })
+    } catch (err: any) {
+      dispatch({
+        type: SET_USER_FAILURE,
+        payload: {
+          message: err.message,
+          status: 500,
+        },
+      })
+    }
+  }
+}
+
 export const signOutUser = () => {
   return (dispatch: AppDispatch) => {
     dispatch({ type: LOGOUT_USER })
@@ -114,16 +168,3 @@ export const resetUserErrors = () => {
     dispatch({ type: CLEAR_USER_ERRORS })
   }
 }
-
-// /**
-//  * @brief Clears only the documents, not the authenticated users.
-//  */
-// export const clearTestUsers = () => {
-//   return async (dispatch: AppDispatch) => {
-//     return authRequestWithDispatch({
-//       dispatch,
-//       endpoint: 'clear_test_users',
-//       types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
-//     })
-//   }
-// }

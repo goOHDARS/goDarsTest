@@ -1,4 +1,4 @@
-import { GET_USER_REQUEST, SET_USER_SUCCESS, signOutUser } from '@actions/user'
+import { deleteAccount, GET_USER_REQUEST, sendResetPassEmail, SET_USER_SUCCESS, signOutUser } from '@actions/user'
 import ScreenLayout from '@components/ScreenLayout'
 import { Modal, View, TouchableOpacity, Text, Image, Alert } from 'react-native'
 import { Edit2, Trash2 } from 'react-native-feather'
@@ -22,6 +22,16 @@ export default (
   const [pokeData, setPokeData] = useState<pokeResponse>()
 
   const [viewProfileCustomizer, setViewProfileCustomizer] = useState(false)
+
+  const years = new Map<number, string>()
+  years.set(1, 'Freshman')
+  years.set(2, 'Sophomore')
+  years.set(3, 'Junior')
+  years.set(4, 'Senior')
+
+  if (!user || !viewProfile) {
+    return null
+  }
 
   const fetchData = async () => {
     dispatch({
@@ -124,20 +134,26 @@ export default (
               </View>
             </TouchableOpacity>
           </View>
-          <Text style={{fontSize: 32, fontWeight: '100', textTransform: 'capitalize', marginLeft: '10%'}}>{user?.name}</Text>
-          <Text style={{fontSize: 20, fontWeight: '100', textTransform: 'capitalize', marginLeft: '10%'}}>{user?.major}</Text>
+          <Text style={{fontSize: 34, fontWeight: '100', textTransform: 'capitalize', marginLeft: '10%', marginBottom: '2.5%'}}>{user?.name}</Text>
+          <View style={{ display: 'flex', flexDirection: 'column', marginLeft: '10%' }}>
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
+              <Text style={{ fontSize: 24, fontWeight: '200' }}>{years.has(Math.floor(user.semester / 2) + 1) ? years.get(Math.floor(user.semester / 2) + 1) : user.semester}</Text>
+              <Text style={{ fontWeight: '100', fontSize: 12 }}>  in  </Text>
+              <Text style={{fontSize: 20, fontWeight: '200', textTransform: 'capitalize'}}>{user?.major}</Text>
+            </View>
+          </View>
           <View style={{ gap: 10, height: '45%', alignSelf: 'flex-start', marginVertical: '5%', marginLeft: '15%'}}>
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
               <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
                 {'PID '}
               </Text>
-              <Text style={{fontSize: 20, fontWeight: '200'}}>{user?.pid}</Text>
+              <Text style={{fontSize: 20, fontWeight: '200'}}>{user.pid}</Text>
             </View>
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
                 {'Email: '}
               </Text>
-              <Text style={{fontSize: 20, fontWeight: '200'}}>{user?.email}</Text>
+              <Text style={{fontSize: 20, fontWeight: '200'}}>{user.email}</Text>
             </View>
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
@@ -145,15 +161,21 @@ export default (
               </Text>
               <Text style={{fontSize: 20, fontWeight: '200'}}>{credits}</Text>
             </View>
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
+                {'GPA: '}
+              </Text>
+              <Text style={{fontSize: 20, fontWeight: '200'}}>{user.gpa}</Text>
+            </View>
           </View>
           <View style={{ width: '90%', alignSelf: 'center', gap: 5 }}>
             <Button
-              onPress={() => signOutUser()}
+              onPress={() => sendResetPassEmail(user.email)}
             >
               Reset Password
             </Button>
             <TouchableOpacity
-              onPress={() => signOutUser()}
+              onPress={() => deleteAccount()}
               style={{
                 display: 'flex',
                 flexDirection: 'row',

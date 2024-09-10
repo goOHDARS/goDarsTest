@@ -54,7 +54,7 @@ const Semesters = () => {
     )
   }
 
-  const viewYears = []
+  const cards = []
 
   for (let i = 0; i < viewSemesters.length; i++) {
     // + 1 for Fall because the semester is 1 base-indexed and not 0
@@ -62,7 +62,7 @@ const Semesters = () => {
     const totalCreditsFall = userCourses?.filter((course) => course.semester === i + 1).reduce((acc, course) => acc + course.credits, 0)
     const totalCreditsSpring = userCourses?.filter((course) => course.semester === i + 2).reduce((acc, course) => acc + course.credits, 0)
     if (i % 2 === 0) {
-      viewYears.push(
+      cards.push(
         <View key={i} style={{ flexDirection: 'column', overflow: 'scroll', gap: 5, marginHorizontal: 20 }}>
           <Text style={styles.title}>
             {years.has(i / 2 + 1)
@@ -79,7 +79,7 @@ const Semesters = () => {
                   <Text style={styles.creditsText}>{'Credits: '}</Text>
                   <Text style={styles.creditsValue}>{totalCreditsFall}</Text>
                 </View>
-                <Text style={styles.springSemesterText}>Fall</Text>
+                <Text style={styles.semesterTakenText}>Fall</Text>
               </View>
             </View>
             <View style={{ alignContent: 'center'}}>
@@ -88,7 +88,7 @@ const Semesters = () => {
             <View style={styles.semesterContainer}>
               {viewSemesters[i + 1]}
               <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline'}}>
-                <Text style={styles.springSemesterText}>Spring</Text>
+                <Text style={styles.semesterTakenText}>Spring</Text>
                 <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline'}}>
                   <Text style={styles.creditsText}>{'Credits: '}</Text>
                   <Text style={styles.creditsValue}>{totalCreditsSpring}</Text>
@@ -101,7 +101,7 @@ const Semesters = () => {
     }
   }
 
-  return viewYears
+  return cards
 
   // <Pressable>
   //   <View
