@@ -14,7 +14,6 @@ type User = {
   onboarded: boolean
   photoURL: string
   borderURLColor: string
-  credits: number
 }
 
 type UserState = BaseState & {
