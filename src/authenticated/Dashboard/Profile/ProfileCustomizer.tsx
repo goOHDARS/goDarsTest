@@ -38,10 +38,6 @@ export default (
 
   const loading = useAppSelector((state) => state.user.loading)
 
-  if (!user) {
-    return null
-  }
-
   const handleSelectColor = ({hex} : any) => {
     if (hex !== '#ffffff') {
       dispatch({
@@ -111,25 +107,34 @@ export default (
     }
   }
 
-  const handleUpdateUser = () => {
-    if (hasChanges) {
-      console.log('semester: ', user.semester)
-      dispatch(updateUser(user))
-      dispatch(getCurrentUser())
+  const handleUpdateUser = async () => {
+    if (hasChanges && user) {
+      console.log('updating user')
+      console.log(user)
+      await dispatch(updateUser(user))
+      await dispatch(getCurrentUser())
     }
+  }
+
+  if (!user) {
+    return null
+  }
+
+  if (!viewProfileCustomizer) {
+    return
   }
 
   return (
     <RNModal
       backdropTransitionOutTiming={450}
       backdropTransitionInTiming={750}
-      animationOutTiming={850}
       animationInTiming={350}
+      animationOutTiming={850}
       onBackButtonPress={() => {
         setViewProfileCustomizer(false)
       }}
       onBackdropPress={() => {
-        Keyboard.dismiss(), setViewProfileCustomizer(false), handleUpdateUser()
+        Keyboard.dismiss(), handleUpdateUser(), setViewProfileCustomizer(false)
       }}
       animationIn={'slideInUp'}
       animationOut={'slideOutDown'}
@@ -216,8 +221,8 @@ export default (
                 contentContainerStyle={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', zIndex: 1, elevation: 1}}
                 horizontal={false}
                 numColumns={3}
-                initialNumToRender={25}
-                maxToRenderPerBatch={25}
+                initialNumToRender={15}
+                maxToRenderPerBatch={15}
                 onMomentumScrollBegin={() => {
                   setScrolling(true)
                 }}

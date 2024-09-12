@@ -124,31 +124,17 @@ export const sendResetPassEmail = (email: string) => {
 }
 
 export const updateUser = (userInfo: User) => {
-  console.log(userInfo.semester)
-
   return async (dispatch: AppDispatch) => {
-    dispatch({ type: SET_USER_REQUEST })
-    try {
-      await authRequestWithDispatch({
-        dispatch,
-        endpoint: 'update_user',
-        method: 'PATCH',
-        types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
-        data: {
-          ...userInfo,
-          startingSemester: userInfo.semester,
-        },
-      })
-      // dispatch({ type: SET_USER_SUCCESS })
-    } catch (err: any) {
-      dispatch({
-        type: SET_USER_FAILURE,
-        payload: {
-          message: err.message,
-          status: 500,
-        },
-      })
-    }
+    await authRequestWithDispatch({
+      dispatch,
+      endpoint: 'update_user',
+      method: 'PATCH',
+      types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
+      data: {
+        ...userInfo,
+      },
+    })
+    // dispatch({ type: SET_USER_SUCCESS })
   }
 }
 

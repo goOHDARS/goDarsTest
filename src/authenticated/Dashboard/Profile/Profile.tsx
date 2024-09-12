@@ -1,4 +1,4 @@
-import { deleteAccount, GET_USER_REQUEST, sendResetPassEmail, SET_USER_SUCCESS, signOutUser } from '@actions/user'
+import { deleteAccount, GET_USER_REQUEST, sendResetPassEmail, SET_USER_FAILURE, SET_USER_SUCCESS, signOutUser } from '@actions/user'
 import ScreenLayout from '@components/ScreenLayout'
 import { Modal, View, TouchableOpacity, Text, Image, Alert } from 'react-native'
 import { Edit2, Trash2 } from 'react-native-feather'
@@ -76,7 +76,7 @@ export default (
       }
     } catch (error: any) {
       dispatch({
-        type: SET_USER_SUCCESS,
+        type: SET_USER_FAILURE,
         payload: {
           ...user,
         },
@@ -164,7 +164,7 @@ export default (
               <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
                 {'GPA: '}
               </Text>
-              <Text style={{fontSize: 20, fontWeight: '200'}}>{user.gpa}</Text>
+              {/* <Text style={{fontSize: 20, fontWeight: '200'}}>{user.gpa}</Text> */}
             </View>
           </View>
           <View style={{ width: '90%', alignSelf: 'center', gap: 5 }}>

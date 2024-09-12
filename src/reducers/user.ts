@@ -11,8 +11,8 @@ export type User = {
   pid: string
   year: number
   semester: number
-  degree: string
-  gpa: number
+  // degree: string
+  // gpa: number
   onboarded: boolean
   photoURL: string
   borderURLColor: string

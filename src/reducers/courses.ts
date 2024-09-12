@@ -15,7 +15,7 @@ export type CourseBrief = {
 }
 
 // an overall course
-type Course = {
+export type Course = {
   id: string
   college: string
   credits: number
