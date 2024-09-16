@@ -8,15 +8,17 @@ import {
   Image,
   StyleSheet,
   ScrollView,
-  TextInput,
-  Animated,
-  Alert,
+  TouchableOpacity,
+  Pressable,
 } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import Onboarding from './Onboarding'
 import Button from '@components/Button'
 import { GET_USER_REQUEST, SET_USER_SUCCESS, signOutUser } from '@actions/user'
 import UserYears from '@components/Semesters'
+import Semesters from '@components/Semesters'
+import Dashboard from './Dashboard/Dashboard'
+import Profile from './Dashboard/Profile/Profile'
 
 type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/app'>
 
@@ -25,12 +27,16 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     width: '100%',
-    height: '20%',
-    alignContent: 'center',
     verticalAlign: 'middle',
-    alignItems: 'center',
+    height: '15%',
+    alignItems: 'flex-start',
     flexDirection: 'row',
     paddingHorizontal: 20,
+    shadowColor: '#000', // For iOS shadow
+    shadowOffset: { width: 0, height: 18 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    backgroundColor: '#fff', // Ensure background color to see the shadow
   },
   mainContainer: {
     display: 'flex',
@@ -49,30 +55,15 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   username: {
-    fontSize: 28,
-    fontWeight: '200',
+    fontSize: 35,
+    fontWeight: '100',
     textTransform: 'capitalize',
   },
   major: {
-    fontSize: 16,
-    fontWeight: '300',
+    fontSize: 20,
+    fontWeight: '200',
   },
-  xButton: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 20,
-    borderRadius: 100,
-  },
-  modalHeaderContainer1: {
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    height: '15%',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 10,
-  },
+
   dropDownText: {
     fontSize: 20,
     height: 50,
@@ -82,34 +73,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#ffffff00',
     width: '100%',
-  },
-  textBoxInput: {
-    display: 'flex',
-    fontSize: 20,
-    height: 50,
-    paddingHorizontal: 10,
-  },
-  textBox: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: '5%',
-    width: '90%',
-    borderWidth: 1,
-    borderColor: '#039942',
-    borderRadius: 10,
-    height: 50,
-  },
-  disabledInputTextContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#039942',
-    height: 50,
-    width: 40,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
   },
 })
 
@@ -122,147 +85,70 @@ export type pokeResponse = {
 
 const useViewModel = (props: Props) => {
   const user = useAppSelector((state) => state.user?.user)
-
   const dispatch = useAppDispatch()
+  const scrollViewRef = useRef<ScrollView>(null)
 
-  const [isVisible, setIsVisible] = useState(false)
-  const [scrolling, setScrolling] = useState(false)
-  const [searching, setSearching] = useState(false)
+  const [viewExtras, setViewExtras] = useState(false)
+  const [viewProfile, setViewProfile] = useState(false)
+  const [viewWhatIfDARS, setViewWhatIfDARS] = useState(false)
+  const [viewFulfilledBricks, setViewFulfilledBricks] = useState(false)
 
-  const autoCompleteDropDownRef: React.LegacyRef<TextInput> = useRef(null)
-  const [pokeDataOriginal, setPokeDataOriginal] = useState<pokeResponse>()
-  const [pokeData, setPokeData] = useState<pokeResponse>()
-  const translation = useRef(new Animated.Value(0)).current
-  const opacity = useRef(new Animated.Value(0)).current
-
-  const fetchData = async () => {
-    dispatch({
-      type: GET_USER_REQUEST,
-    })
-
-    try {
-      const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025')
-      const pokeData = await response.json()
-
-      if (pokeData && response.ok && user) {
-        const pokeDataTyped = pokeData as pokeResponse
-
-        let i = pokeDataTyped.results.length - 1
-        while (i > 0 && pokeDataTyped.results[i].url !== user?.photoURL) {
-          pokeDataTyped.results[i].url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i}.png`
-          pokeDataTyped.results[i].name = pokeDataTyped.results[i - 1].name
-          i--
-        }
-
-        if (pokeDataTyped.results[i].url === user.photoURL) {
-          i -= 1
-          while (i > 0) {
-            pokeDataTyped.results[i].url = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i}.png`
-            pokeDataTyped.results[i].name = pokeDataTyped.results[i - 1].name
-            i--
-          }
-        }
-
-        if (user) {
-          const index = pokeDataTyped.results.findIndex((poke) => poke.url === user.photoURL)
-          pokeDataTyped.results[0] = pokeDataTyped.results[index]
-        }
-
-        setPokeData(pokeDataTyped)
-        setPokeDataOriginal(pokeDataTyped)
-        dispatch({
-          type: SET_USER_SUCCESS,
-          payload: {
-            ...user,
-          },
-        })
-      }
-    } catch (error: any) {
-      dispatch({
-        type: SET_USER_SUCCESS,
-        payload: {
-          ...user,
-        },
-      })
-      // setViewProfilePictures(false)
-      Alert.alert('goOHDARS', 'Couldn\'t perform that action. Please try again later.', [
-        {
-          text: 'Confirm',
-          style: 'default',
-        },
-      ])
-
-      console.log(error.message)
-    }
+  return {
+    ...props,
+    user,
+    dispatch,
+    scrollViewRef,
+    viewExtras,
+    viewProfile,
+    viewWhatIfDARS,
+    viewFulfilledBricks,
+    setViewExtras,
+    setViewProfile,
+    setViewWhatIfDARS,
+    setViewFulfilledBricks,
   }
-
-  const updatePokeData = (item: {name: string, url: string}) => {
-    if (pokeData) {
-      const index = pokeData.results.findIndex((poke) => poke.url === item.url)
-      pokeData.results[0] = pokeData.results[index]
-      setPokeData(pokeData)
-    }
-  }
-
-  const handleUserSignOut = () => {
-    dispatch(signOutUser())
-  }
-
-  useEffect(() => {
-    if (searching) {
-      Animated.timing(translation, {
-        toValue: -200,
-        useNativeDriver: true,
-      }).start()
-    } else {
-      Animated.timing(translation, {
-        toValue: 0,
-        useNativeDriver: true,
-      }).start()
-    }
-
-    if (scrolling) {
-      console.log('scrolling')
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 450,
-        useNativeDriver: true,
-      }).start()
-    } else {
-      console.log('not scrolling')
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 650,
-        useNativeDriver: true,
-      }).start()
-    }
-  }, [searching, scrolling])
-
-  return { ...props, user, dispatch, handleUserSignOut }
 }
 
 const MainPageRoot = (props: ReturnType<typeof useViewModel>) => {
   return props.user?.onboarded ? (
-    <ScreenLayout>
-      <View style={{ flex: 1 }}>
-        <View style={styles.headerContainer}>
-          <View style={styles.userContainer}>
-            <Text style={styles.username}>{props.user?.name}</Text>
-            <Text style={styles.major}>{props.user?.major}</Text>
-          </View>
+    <ScreenLayout extraStyles={{ backgroundColor: '#fff'}}>
+      <View style={styles.headerContainer}>
+        <View style={styles.userContainer}>
+          <Text style={styles.username}>{props.user?.name}</Text>
+          <Text style={styles.major}>{props.user?.major}</Text>
+        </View>
+        <TouchableOpacity style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10, width: 90, height: 90 }} onPress={() => {
+          props.setViewExtras(!props.viewExtras), console.log(props.user?.photoURL)
+        }}>
           <Image
-            style={styles.userImage}
+            style={[styles.userImage, { borderColor: props.user.borderURLColor}]}
             source={{ uri: props.user?.photoURL }}
             alt="user profile picture"
-          />
-        </View>
-        <ScrollView contentContainerStyle={{ gap: 20 }}>
-          <UserYears />
-        </ScrollView>
-        <Button onPress={() => props.handleUserSignOut} color="#039942">
-          Logout
-        </Button>
+          ></Image>
+        </TouchableOpacity>
       </View>
+      <ScrollView
+        nestedScrollEnabled={true}
+        ref={props.scrollViewRef}
+        onScrollBeginDrag={() => {
+          props.viewExtras ? props.setViewExtras(false) : undefined
+        }}>
+        <Pressable style={{ gap: 20, paddingBottom: 50, paddingTop: 25}}>
+          <Semesters />
+        </Pressable>
+      </ScrollView>
+      <Dashboard
+        viewExtras={props.viewExtras} setViewExtras={props.setViewExtras}
+        viewProfile={props.viewProfile} setViewProfile={props.setViewProfile}
+        viewFulfilledBricks={props.viewFulfilledBricks} setViewFulfilledBricks={props.setViewFulfilledBricks}
+        viewWhatIfDARS={props.viewWhatIfDARS} setViewWhatIfDARS={props.setViewWhatIfDARS}></Dashboard>
+      <Profile
+        viewProfile={props.viewProfile} setViewProfile={props.setViewProfile}
+      >
+      </Profile>
+      {/* <Button onPress={() => dispatch(signOutUser())} color="#039942">
+        Logout
+      </Button> */}
     </ScreenLayout>
   ) : (
     <Onboarding />

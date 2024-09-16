@@ -6,13 +6,12 @@ import { CourseBrief } from 'src/reducers/courses'
 export default (
   { credits, setCredits, selectedCourses, setSelectedCourses, setEditing }
   :
-  { credits: number, 
+  { credits: number,
     setCredits: React.Dispatch<React.SetStateAction<number>>,
     selectedCourses: CourseBrief[],
     setSelectedCourses: React.Dispatch<React.SetStateAction<CourseBrief[]>>,
     setEditing: React.Dispatch<React.SetStateAction<boolean>>,
   }) => {
-
   const user = useAppSelector((state) => state.user.user)
   const handlePressX = (courseParam: CourseBrief) => {
     setSelectedCourses(
@@ -95,9 +94,8 @@ const styles = StyleSheet.create({
   selectedCourse: {
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%',
+    width: '75%',
   },
   selectedCourseExtraText: {
     fontSize: 12,
@@ -105,20 +103,20 @@ const styles = StyleSheet.create({
   },
   editCourseText: {
     fontSize: 12,
-    width: '30%',
+    width: '33.3%',
     textAlign: 'center',
   },
   editCourseTextAlt: {
     color: '#BBBBBB',
     fontSize: 12,
-    width: '30%',
+    width: '33.3%',
     textAlign: 'center',
   },
   editCourseTextContainer: {
     flex: 1,
     flexDirection: 'column',
     textAlign: 'left',
-    maxWidth: '30%',
+    maxWidth: '33.3%',
   },
   editCourseTextLeft: {
     fontSize: 14,
@@ -126,7 +124,7 @@ const styles = StyleSheet.create({
   },
   editCourseTextRight: {
     fontSize: 12,
-    width: '30%',
+    width: '33.3%',
     textAlign: 'right',
   },
 })

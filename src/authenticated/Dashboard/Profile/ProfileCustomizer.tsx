@@ -101,7 +101,6 @@ export default (
   const handleUpdateUser = async () => {
     if (hasChanges && user) {
       await dispatch(updateUser(user))
-      await dispatch(getCurrentUser())
     }
   }
 

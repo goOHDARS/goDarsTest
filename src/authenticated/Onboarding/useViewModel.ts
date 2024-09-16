@@ -181,6 +181,10 @@ const useViewModel = () => {
     }
   }
 
+  const handleEditSemesters = () => {
+    setModalVisible(true)
+  }
+
   const handleResetQuery = () => {
     dispatch(resetQueryCourses())
   }
@@ -245,6 +249,7 @@ const useViewModel = () => {
     translation,
     infoVisible,
     scrollViewRef,
+    handleEditSemesters,
   }
 }
 

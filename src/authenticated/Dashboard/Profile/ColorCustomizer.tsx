@@ -43,9 +43,13 @@ export default (
   }
 
   return (
-    <Modal animationType='slide' visible={isVisible} presentationStyle='pageSheet' onRequestClose={() => {
-      setIsVisible(false), handleSelectColor(colorPicked)
-    }}>
+    <Modal
+      animationType='slide'
+      visible={isVisible}
+      presentationStyle='pageSheet'
+      onRequestClose={() => {
+        setIsVisible(false), handleSelectColor(colorPicked ? colorPicked : user?.borderURLColor)
+      }}>
       <ScreenLayout>
         <View style={{ width: '100%', height: '100%', alignItems: 'center', gap: 40}}>
           <View style={{ width: '10%', height: 3, backgroundColor: 'gray', marginTop: 5, borderRadius: 100}}>

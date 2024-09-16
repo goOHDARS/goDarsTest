@@ -105,7 +105,7 @@ export const deleteAccount = () => {
     return authRequestWithDispatch({
       dispatch,
       method: 'DELETE',
-      endpoint: 'clear_test_users',
+      endpoint: 'delete_users',
       types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
     })
   }
