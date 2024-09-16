@@ -131,7 +131,13 @@ export const updateUser = (userInfo: User) => {
       method: 'PATCH',
       types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
       data: {
-        ...userInfo,
+        name: userInfo.name,
+        major: userInfo.major,
+        email: userInfo.email,
+        pid: userInfo.pid,
+        onboarded: userInfo.onboarded,
+        photoURL: userInfo.photoURL,
+        borderURLColor: userInfo.borderURLColor,
       },
     })
     // dispatch({ type: SET_USER_SUCCESS })

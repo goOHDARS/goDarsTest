@@ -1,6 +1,17 @@
-import { deleteAccount, GET_USER_REQUEST, sendResetPassEmail, SET_USER_FAILURE, SET_USER_SUCCESS, signOutUser } from '@actions/user'
+import {
+  deleteAccount,
+  GET_USER_REQUEST,
+  sendResetPassEmail,
+  SET_USER_FAILURE,
+  SET_USER_SUCCESS } from '@actions/user'
 import ScreenLayout from '@components/ScreenLayout'
-import { Modal, View, TouchableOpacity, Text, Image, Alert } from 'react-native'
+import {
+  Modal,
+  View,
+  TouchableOpacity,
+  Text,
+  Image,
+  Alert } from 'react-native'
 import { Edit2, Trash2 } from 'react-native-feather'
 import ProfileCustomizer, { pokeResponse } from './ProfileCustomizer'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
@@ -82,6 +93,7 @@ export default (
         },
       })
       setViewProfileCustomizer(false)
+
       Alert.alert('goOHDARS', 'Couldn\'t perform that action. Please try again later.', [
         {
           text: 'Confirm',
@@ -109,7 +121,7 @@ export default (
             }}>
               <View>
                 <Image
-                  style={{ width: 90, height: 90, borderRadius: 100, borderColor: user?.borderURLColor, borderWidth: 1, alignSelf: 'flex-end'}}
+                  style={{ width: 90, height: 90, borderRadius: 100, borderColor: user.borderURLColor, borderWidth: 1, alignSelf: 'flex-end'}}
                   source={{ uri: user?.photoURL }}
                   alt="user profile picture"
                 ></Image>
@@ -160,12 +172,12 @@ export default (
               </Text>
               <Text style={{fontSize: 20, fontWeight: '200'}}>{credits}</Text>
             </View>
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            {/* <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
                 {'GPA: '}
               </Text>
-              {/* <Text style={{fontSize: 20, fontWeight: '200'}}>{user.gpa}</Text> */}
-            </View>
+              <Text style={{fontSize: 20, fontWeight: '200'}}>{user.gpa}</Text>
+            </View> */}
           </View>
           <View style={{ width: '90%', alignSelf: 'center', gap: 5 }}>
             <Button
@@ -195,8 +207,6 @@ export default (
               <Trash2 color='white' width={25} height={25} strokeWidth={2.25}></Trash2>
             </TouchableOpacity>
           </View>
-
-
           {/* <Text style={{fontSize: 20, fontWeight: '500', color: 'red'}}>Reset Password</Text>
           <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}}>
             <Trash2 color='red' width={25} height={25} strokeWidth={3}></Trash2>

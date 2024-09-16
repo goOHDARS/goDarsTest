@@ -14,11 +14,6 @@ export default (
   {modalVisible: boolean, setModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
   selectedCourses: CourseBrief[], setSelectedCourses: React.Dispatch<React.SetStateAction<CourseBrief[]>>, loading: boolean
    }) => {
-  // was re-rendering every time the query was changed
-  if (!modalVisible) {
-    return null
-  }
-
   const dispatch = useAppDispatch()
   const course = useAppSelector((state) => state.courses.selectedCourse)
   const user = useAppSelector((state) => state.user.user)
@@ -42,20 +37,16 @@ export default (
     })
   }
 
-  const checkSemesterPrereq = (course: Course, newSemester: number) => {
-    console.log('course', course)
+  const checkSemesterPrereq = (course: Course | undefined, newSemester: number) => {
+    if (!course) {
+      return
+    }
     course.prereq.forEach((prereq) => {
-      console.log('prereq', prereq)
-
       const prereqCourse = selectedCourses.find(
         (course) => {
-          console.log('course.shortName', course.shortName)
           return course.shortName === prereq
         }
       )
-
-      console.log('newSemester', newSemester)
-      console.log('prereqCourse.semester', prereqCourse?.semester)
       if (prereqCourse && prereqCourse.semester && prereqCourse.semester >= newSemester) {
         return false
       }
@@ -64,13 +55,23 @@ export default (
     return true
   }
 
+  const handleUpdateCourses = (changedCourse: CourseBrief, newSemester: number) => {
+    const updatedCourses = selectedCourses.map((tempCourse) => {
+      if (tempCourse.shortName === changedCourse.shortName) {
+        return { ...tempCourse, semester: newSemester }
+      }
+      return tempCourse
+    })
+    setSelectedCourses(updatedCourses)
+  }
+
   const handleEditSemester = (
     changedCourse: CourseBrief,
     newSemester: string
   ) => {
     dispatch(getCourseInfo(changedCourse.shortName))
 
-    if (!course) {
+    if (!changedCourse) {
       return
     }
 
@@ -78,23 +79,17 @@ export default (
       return
     }
 
-    if (!checkSemesterPrereq(course, +newSemester)) {
-      Alert.alert('goOHDARS', 'Cannot change the semester of ' + changedCourse.shortName + ' to ' + newSemester + ' because it is lower than the semester of a prerequisite course.', [
-        {
-          text: 'Cancel',
-          style: 'destructive',
-        },
-      ])
-    }
+    // if (!checkSemesterPrereq(course, +newSemester)) {
+    //   Alert.alert('goOHDARS', 'Cannot change the semester of ' + changedCourse.shortName + ' to ' + newSemester + ' because it is lower than the semester of a prerequisite course.', [
+    //     {
+    //       text: 'Cancel',
+    //       style: 'destructive',
+    //     },
+    //   ])
+    // }
 
-    if (user?.semester && user?.semester >= +newSemester) {
-      const updatedCourses = selectedCourses.map((course) => {
-        if (course.shortName === changedCourse.shortName) {
-          return { ...course, semester: +newSemester }
-        }
-        return course
-      })
-      setSelectedCourses(updatedCourses)
+    if (user?.semester && user.semester >= +newSemester) {
+      handleUpdateCourses(changedCourse, +newSemester)
     } else {
       Alert.alert('goOHDARS', 'Cannot change the semester of ' + changedCourse.shortName + ' to ' + newSemester + ' because it is higher than your current semester, ' + user?.semester + '.', [
         {
@@ -102,13 +97,7 @@ export default (
           style: 'destructive',
         },
       ])
-      const updatedCourses = selectedCourses.map((course) => {
-        if (course.shortName === changedCourse.shortName) {
-          return { ...course, semester: 0 } // Create a new object with updated semester
-        }
-        return course
-      })
-      setSelectedCourses(updatedCourses)
+      handleUpdateCourses(changedCourse, 0)
     }
   }
 
@@ -131,6 +120,11 @@ export default (
         },
       ]
     )
+  }
+
+  // was re-rendering every time the query was changed
+  if (!modalVisible) {
+    return null
   }
 
   return (
@@ -257,10 +251,11 @@ export default (
           <Button
             disabled={
               selectedCourses.filter(
-                (course) =>
-                  course.semester?.toString() === '' ||
-                  course.semester === 0 ||
-                  !course.semester
+                (course) => {
+                  return course.semester?.toString() === '' ||
+                    course.semester === 0 ||
+                    !course.semester
+                }
               ).length > 0
             }
             fullWidth

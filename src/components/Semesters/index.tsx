@@ -1,13 +1,9 @@
 import { View, Text, Pressable, ScrollView } from 'react-native'
-import React, { useEffect } from 'react'
 import Divider from '@components/Divider'
 import { CourseBrief } from 'src/reducers/courses'
 import {
-  useAppDispatch,
   useAppSelector,
 } from '@hooks/store'
-import { getCurrentMajor } from '@actions/majors'
-import { getCourses } from '@actions/courses'
 import { styles } from './styles'
 
 /**
@@ -28,12 +24,6 @@ const Semesters = () => {
 
   const userCourses = useAppSelector((state) => state.courses.courses)
   const major = useAppSelector((state) => state.majors.currentMajor)
-  const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    dispatch(getCurrentMajor())
-    dispatch(getCourses())
-  }, [])
 
   const viewSemesters = []
 
@@ -61,6 +51,7 @@ const Semesters = () => {
     // + 2 for Spring because the semester is 1 base-indexed and not 0
     const totalCreditsFall = userCourses?.filter((course) => course.semester === i + 1).reduce((acc, course) => acc + course.credits, 0)
     const totalCreditsSpring = userCourses?.filter((course) => course.semester === i + 2).reduce((acc, course) => acc + course.credits, 0)
+
     if (i % 2 === 0) {
       cards.push(
         <View key={i} style={{ flexDirection: 'column', overflow: 'scroll', gap: 5, marginHorizontal: 20 }}>

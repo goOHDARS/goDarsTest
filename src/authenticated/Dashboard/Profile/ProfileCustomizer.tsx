@@ -1,13 +1,22 @@
 import RNModal from 'react-native-modal'
-import ColorPicker, { Panel1, Swatches, Preview, HueSlider } from 'reanimated-color-picker'
-import { ActivityIndicator, Alert, Animated, FlatList, Keyboard, Pressable, TextInput, Image, Modal, View, Text, TouchableOpacity } from 'react-native'
+import {
+  ActivityIndicator,
+  Animated,
+  FlatList,
+  Keyboard,
+  Pressable,
+  TextInput,
+  Image,
+  View,
+  Text,
+  TouchableOpacity } from 'react-native'
 import { useEffect, useRef, useState } from 'react'
 import ScreenLayout from '@components/ScreenLayout'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { getCurrentUser, SET_USER_SUCCESS, updateUser } from '@actions/user'
 import { X, Search, XCircle } from 'react-native-feather'
 import { styles } from './styles'
-import Button from '@components/Button'
+import ColorCustomizer from './ColorCustomizer'
 
 export type pokeResponse = {
   count: number,
@@ -29,28 +38,15 @@ export default (
   const [query, setQuery] = useState('')
   const [scrolling, setScrolling] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
-  const [colorPicked, setColorPicked] = useState<any>()
+
 
   const [hasChanges, setHasChanges] = useState(false)
 
-  const autoCompleteDropDownRef: React.LegacyRef<TextInput> = useRef(null)
+  const autoCompleteDropDownRef = useRef<TextInput>(null)
   const opacity = useRef(new Animated.Value(0)).current
 
   const loading = useAppSelector((state) => state.user.loading)
 
-  const handleSelectColor = ({hex} : any) => {
-    if (hex !== '#ffffff') {
-      dispatch({
-        type: SET_USER_SUCCESS,
-        payload: {
-          ...user,
-          borderURLColor: hex,
-        },
-      })
-      console.log(hex)
-      setHasChanges(true)
-    }
-  }
 
   const updatePokeData = (item: {name: string, url: string}) => {
     if (pokeData) {
@@ -74,14 +70,12 @@ export default (
     }
 
     if (scrolling) {
-      console.log('scrolling')
       Animated.timing(opacity, {
         toValue: 1,
         duration: 450,
         useNativeDriver: true,
       }).start()
     } else {
-      console.log('not scrolling')
       Animated.timing(opacity, {
         toValue: 0,
         duration: 650,
@@ -94,7 +88,6 @@ export default (
     setQuery(e)
 
     if (e === '') {
-      console.log(pokeDataOriginal)
       setPokeData(pokeDataOriginal)
       return
     }
@@ -102,15 +95,11 @@ export default (
       const newPokeResults: pokeResponse = { ...pokeDataOriginal }
       newPokeResults.results = newPokeResults.results?.filter((poke) => poke.name.includes(e))
       setPokeData(newPokeResults)
-
-      console.log(newPokeResults.results?.length)
     }
   }
 
   const handleUpdateUser = async () => {
     if (hasChanges && user) {
-      console.log('updating user')
-      console.log(user)
       await dispatch(updateUser(user))
       await dispatch(getCurrentUser())
     }
@@ -146,7 +135,7 @@ export default (
       }}>
         {/* smh safeAreaView borderradius cockblocking me */}
         <ScreenLayout onDismissFunc={() => {
-          setSearching(false), console.log('screenlayout ondismissfunc')
+          setSearching(false)
         }} extraStyles={{ borderRadius: 10 }} style={{ justifyContent: 'flex-start'}}>
           <View style={styles.modalHeaderContainer1}>
             <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 20}}>
@@ -191,27 +180,6 @@ export default (
                   </TouchableOpacity> : null
                 }
               </View>
-              {/* <AutocompleteDropdown
-                onChangeText={(e) => handleSetQuery(e)}
-                ref={autoCompleteDropDownRef}
-                onFocus={autoCompleteDropDownRef.current?.isFocsused ? () => {setSearching(true), console.log('focused')} : () => {setSearching(false), console.log('not focused')}}
-                containerStyle={styles.textBoxInput}
-                textInputProps={{
-                  style: styles.dropDownText,
-                  placeholder: 'Charizard...',
-                  placeholderTextColor: '#BBBBBB',
-                }}
-                onSubmit={() => {setSearching(false)}}
-                inputContainerStyle={styles.dropDownInput}
-                rightButtonsContainerStyle={{ height: 50 }}
-                showClear={searching}
-                onClear={() => {setSearching(false), setQuery(''), setPokeData(pokeDataOriginal)}}
-                clearOnFocus={false}
-                useFilter={true}
-                closeOnSubmit={false}
-                showChevron={false}
-                direction={Platform.select({ ios: 'down' })}
-              /> */}
             </View>
             : null }
           { !loading ?
@@ -268,39 +236,13 @@ export default (
                       user?.borderURLColor === undefined
                         ? 'hotpink' : user.borderURLColor }}>
                 </Pressable>
-                {/* <Pressable onPress={() => {}}>
-
-                </Pressable> */}
               </View>
-              <Modal animationType='slide' visible={isVisible} presentationStyle='pageSheet' onRequestClose={() => {
-                setIsVisible(false), handleSelectColor(colorPicked)
-              }}>
-                <ScreenLayout>
-                  <View style={{ width: '100%', height: '100%', alignItems: 'center', gap: 40}}>
-                    <View style={{ width: '10%', height: 3, backgroundColor: 'gray', marginTop: 5, borderRadius: 100}}>
-                    </View>
-                    <ColorPicker onComplete={setColorPicked} sliderThickness={25} thumbSize={25}
-                      thumbShape='circle'
-                      boundedThumb={true}
-                      style={{ height: '60%', width: '90%'}}
-                      value='red'>
-
-                      <Preview />
-                      <Panel1 />
-                      <HueSlider />
-                      <Swatches style={{marginTop: 20}} />
-                    </ColorPicker>
-                    <View style={{ width: '90%', height: '25%', gap: 10, justifyContent: 'flex-end'}}>
-                      <Text style={{ fontSize: 13, alignSelf: 'center'}}>Picking a color may take a few seconds...</Text>
-                      <Button loading={loading} disabled={colorPicked === user?.borderURLColor} onPress={() => {
-                        setIsVisible(false), handleSelectColor(colorPicked)
-                      }}>
-                        Save Changes
-                      </Button>
-                    </View>
-                  </View>
-                </ScreenLayout>
-              </Modal>
+              <ColorCustomizer
+                isVisible={isVisible}
+                setIsVisible={setIsVisible}
+                setHasChanges={setHasChanges}
+              >
+              </ColorCustomizer>
             </View>
             : <View style={{ width: '100%', height: '50%', justifyContent: 'center' }}><ActivityIndicator color={'#039942'}></ActivityIndicator></View>}
         </ScreenLayout>
