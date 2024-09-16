@@ -246,7 +246,6 @@ const useViewModel = () => {
     typing,
     setTyping,
     translation,
-    infoVisible,
     scrollViewRef,
     handleEditSemesters,
   }

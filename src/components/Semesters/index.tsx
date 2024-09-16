@@ -15,7 +15,7 @@ import { styles } from './styles'
  * @returns React.JSX.Element
  */
 
-const Semesters = () => {
+export default () => {
   const years = new Map<number, string>()
   years.set(1, 'Freshman')
   years.set(2, 'Sophomore')
@@ -124,5 +124,3 @@ const Semesters = () => {
   //   </View>
   // </Pressable>
 }
-
-export default Semesters

@@ -11,11 +11,8 @@ import {
   TouchableOpacity,
   Pressable,
 } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Onboarding from './Onboarding'
-import Button from '@components/Button'
-import { GET_USER_REQUEST, SET_USER_SUCCESS, signOutUser } from '@actions/user'
-import UserYears from '@components/Semesters'
 import Semesters from '@components/Semesters'
 import Dashboard from './Dashboard/Dashboard'
 import Profile from './Dashboard/Profile/Profile'
