@@ -8,15 +8,11 @@ import {
   ScrollView,
   Platform,
   Animated,
-  Modal,
-  Pressable,
-  TextInput,
 } from 'react-native'
 import {
   AutocompleteDropdown,
 } from 'react-native-autocomplete-dropdown'
 import {
-  HelpCircle,
   Info,
   Search,
 } from 'react-native-feather'
@@ -103,16 +99,14 @@ const OnboardingRoot = (props: Props) => {
             />
           </View>
         </View>
-        {props.infoVisible ?
-          <View style={{ display: 'flex', flexDirection: 'row', width: '90%', gap: 5}}>
-            <Info color={'black'} width={15}></Info>
-            <Text style={{ fontSize: 11 }}>
-              {'Below are suggested semesters for these courses,' +
-            ' edit the semester if the course was taken at a different time.' +
-            ' Scroll to view the whole name of the course in the Clipboard.'}
-            </Text>
-          </View>
-          : null}
+        <View style={{ display: 'flex', flexDirection: 'row', width: '90%', gap: 5}}>
+          <Info color={'black'} width={15}></Info>
+          <Text style={{ fontSize: 11 }}>
+            {'Below are suggested semesters for these courses,' +
+          ' edit the semester if the course was taken at a different time.' +
+          ' Scroll to view the whole name of the course in the Clipboard.'}
+          </Text>
+        </View>
         <View style={styles.clipboardContainer}>
           <Text style={styles.clipboard}>Clipboard</Text>
           <View style={styles.divider}></View>

@@ -31,7 +31,6 @@ const useViewModel = () => {
   const [initialized, setInitialized] = useState(false)
   const [editing, setEditing] = useState(false)
   const [typing, setTyping] = useState(false)
-  const [infoVisible, setInfoVisible] = useState(true)
 
   const scrollViewRef = useRef<ScrollView>(null)
 
