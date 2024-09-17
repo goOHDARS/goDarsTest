@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     width: '100%',
     height: '100%',
-    borderWidth: 1,
+    borderWidth: 2,
     borderRadius: 100,
     position: 'absolute',
   },

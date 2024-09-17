@@ -13,9 +13,9 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import ScreenLayout from '@components/ScreenLayout'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
-import { getCurrentUser, SET_USER_SUCCESS, updateUser } from '@actions/user'
+import { SET_USER_SUCCESS, updateUser } from '@actions/user'
 import { X, Search, XCircle } from 'react-native-feather'
-import { styles } from './styles'
+import styles from './styles'
 import ColorCustomizer from './ColorCustomizer'
 
 export type pokeResponse = {
@@ -26,7 +26,7 @@ export type pokeResponse = {
 }
 
 export default (
-  {viewProfileCustomizer, setViewProfileCustomizer, pokeData, setPokeData, pokeDataOriginal, setPokeDataOriginal, searching, setSearching}
+  {viewProfileCustomizer, setViewProfileCustomizer, pokeData, setPokeData, pokeDataOriginal, searching, setSearching}
   :
   {viewProfileCustomizer: boolean, setViewProfileCustomizer: React.Dispatch<React.SetStateAction<boolean>>, pokeData?: pokeResponse, setPokeData: React.Dispatch<React.SetStateAction<pokeResponse | undefined>>, pokeDataOriginal?: pokeResponse, setPokeDataOriginal: React.Dispatch<React.SetStateAction<pokeResponse | undefined>>, searching: boolean, setSearching: React.Dispatch<React.SetStateAction<boolean>>}
 ) => {
@@ -39,14 +39,13 @@ export default (
   const [scrolling, setScrolling] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
 
-
   const [hasChanges, setHasChanges] = useState(false)
 
   const autoCompleteDropDownRef = useRef<TextInput>(null)
-  const opacity = useRef(new Animated.Value(0)).current
+  const RNModalRef = useRef<RNModal>(null)
+  // const opacity = useRef(new Animated.Value(0)).current
 
   const loading = useAppSelector((state) => state.user.loading)
-
 
   const updatePokeData = (item: {name: string, url: string}) => {
     if (pokeData) {
@@ -69,20 +68,20 @@ export default (
       }).start()
     }
 
-    if (scrolling) {
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 450,
-        useNativeDriver: true,
-      }).start()
-    } else {
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 650,
-        useNativeDriver: true,
-      }).start()
-    }
-  }, [searching, scrolling])
+    // if (scrolling) {
+    //   Animated.timing(opacity, {
+    //     toValue: 1,
+    //     duration: 450,
+    //     useNativeDriver: true,
+    //   }).start()
+    // } else {
+    //   Animated.timing(opacity, {
+    //     toValue: 0,
+    //     duration: 650,
+    //     useNativeDriver: true,
+    //   }).start()
+    // }
+  }, [searching])
 
   const handleSetQuery = (e: string) => {
     setQuery(e)
@@ -114,24 +113,34 @@ export default (
 
   return (
     <RNModal
-      backdropTransitionOutTiming={450}
-      backdropTransitionInTiming={750}
-      animationInTiming={350}
-      animationOutTiming={850}
       onBackButtonPress={() => {
         setViewProfileCustomizer(false)
       }}
       onBackdropPress={() => {
-        Keyboard.dismiss(), handleUpdateUser(), setViewProfileCustomizer(false)
+        Keyboard.dismiss(), handleUpdateUser(), RNModalRef.current?.close(), setTimeout(() => {
+          setViewProfileCustomizer(false)
+        }, 350)
       }}
+      ref={RNModalRef}
+      animationInTiming={350}
+      animationOutTiming={350}
+      backdropTransitionInTiming={350}
+      backdropTransitionOutTiming={350}
       animationIn={'slideInUp'}
       animationOut={'slideOutDown'}
       isVisible={viewProfileCustomizer}
       style={{ alignItems: 'flex-end', justifyContent: 'flex-end', margin: 0}}>
-      <Animated.View style={{ width: '100%', height: '60%', backgroundColor: 'white', borderRadius: 10, transform: [
-        {translateY: translation},
-        {perspective: 1000}], // without this line this Animation will not render on Android while working fine on iOS
-      }}>
+      <View
+        style={{
+          width: '100%',
+          height: '60%',
+          backgroundColor: 'white',
+          borderRadius: 10,
+          // transform: [
+          //   {translateY: translation},
+          //   {perspective: 1000} // without this line this Animation will not render on Android while working fine on iOS
+          // ],
+        }}>
         {/* smh safeAreaView borderradius cockblocking me */}
         <ScreenLayout onDismissFunc={() => {
           setSearching(false)
@@ -207,7 +216,7 @@ export default (
                         photoURL: item.url,
                       }}), updatePokeData(item), setSearching(false), setHasChanges(true)
                     }} style={{ width: '33%', display: 'flex', flexDirection: 'column', alignItems: 'center'}} key={index}>
-                      <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 80, height: 80, borderRadius: 100, borderWidth: 1, borderColor: (index === 0 ? user?.borderURLColor : 'black')}}>
+                      <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 80, height: 80, borderRadius: 100, borderWidth: index === 0 && item.url === user.photoURL ? 2 : 1, borderColor: (index === 0 && item.url === user.photoURL ? user?.borderURLColor : 'black')}}>
                         <Image
                           source={{ uri: item.url}}
                           alt='pokemon image'
@@ -215,13 +224,14 @@ export default (
                         />
                       </View>
                       <Text style={{ fontSize: 12, fontWeight: '200'}}>{item.name}</Text>
-                      <Text style={{ fontSize: 12, fontWeight: '200'}}>{index !== 0 ? '\u{FE5F}' : ''}{index !== 0 ? index : ''}</Text>
+                      <Text style={{ fontSize: 12, fontWeight: '200'}}>{item.url !== user.photoURL && index === 0 ? '\u{FE5F}' : ''}{item.url !== user.photoURL && index === 0 ? index : ''}</Text>
                     </Pressable>
                   )
                 }}
               />
               <View style={{ display: 'flex', flexDirection: 'column', width: '25%', alignItems: 'center'}}>
-                <Text style={{ fontSize: 10}}>Pick your favorite color</Text>
+                <Text style={{ fontSize: 10 }}>Pick your</Text>
+                <Text style={{ fontSize: 10}}>favorite color</Text>
                 <Pressable
                   onPress={() => {
                     setIsVisible(true)
@@ -245,7 +255,7 @@ export default (
             </View>
             : <View style={{ width: '100%', height: '50%', justifyContent: 'center' }}><ActivityIndicator color={'#039942'}></ActivityIndicator></View>}
         </ScreenLayout>
-      </Animated.View>
+      </View>
     </RNModal>
   )
 }

@@ -12,11 +12,12 @@ import {
   Text,
   Image,
   Alert } from 'react-native'
-import { Edit2, Trash2 } from 'react-native-feather'
+import { Edit2, HelpCircle, Trash2 } from 'react-native-feather'
 import ProfileCustomizer, { pokeResponse } from './ProfileCustomizer'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { useState } from 'react'
 import Button from '@components/Button'
+import styles from './styles'
 
 export default (
   {viewProfile, setViewProfile}
@@ -121,7 +122,7 @@ export default (
             }}>
               <View>
                 <Image
-                  style={{ width: 90, height: 90, borderRadius: 100, borderColor: user.borderURLColor, borderWidth: 1, alignSelf: 'flex-end'}}
+                  style={{ width: 90, height: 90, borderRadius: 100, borderColor: user.borderURLColor, borderWidth: 2, alignSelf: 'flex-end'}}
                   source={{ uri: user?.photoURL }}
                   alt="user profile picture"
                 ></Image>
@@ -140,7 +141,7 @@ export default (
                     borderColor: 'black',
                     borderWidth: 1,
                   }}>
-                  <Edit2 color='black' width={15} height={15} ></Edit2>
+                  <Edit2 color='black' width={15} height={15}></Edit2>
                 </View>
               </View>
             </TouchableOpacity>
@@ -148,29 +149,32 @@ export default (
           <Text style={{fontSize: 34, fontWeight: '100', textTransform: 'capitalize', marginLeft: '10%', marginBottom: '2.5%'}}>{user?.name}</Text>
           <View style={{ display: 'flex', flexDirection: 'column', marginLeft: '10%' }}>
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
-              <Text style={{ fontSize: 24, fontWeight: '200' }}>{years.has(Math.floor(user?.semester / 2) + 1) ? years.get(Math.floor(user?.semester / 2) + 1) : user?.semester}</Text>
+              <Text style={{ fontSize: 24, fontWeight: '200' }}>
+                {years.has(Math.floor(user?.semester / 2) + 1) ? years.get(Math.floor(user?.semester / 2) + 1) : user?.semester}
+              </Text>
               <Text style={{ fontWeight: '100', fontSize: 12 }}>  in  </Text>
               <Text style={{fontSize: 20, fontWeight: '200', textTransform: 'capitalize'}}>{user?.major}</Text>
             </View>
           </View>
+          {/* @TODO: remove height property if QR code is a valid view */}
           <View style={{ gap: 10, height: '45%', alignSelf: 'flex-start', marginVertical: '5%', marginLeft: '15%'}}>
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-              <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
+            <View style={styles.importantBlockContainer}>
+              <Text style={styles.importantBlockOuterText}>
                 {'PID '}
               </Text>
-              <Text style={{fontSize: 20, fontWeight: '200'}}>{user.pid}</Text>
+              <Text style={styles.importantBlockInnerText}>{user.pid}</Text>
             </View>
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
+            <View style={styles.importantBlockContainer}>
+              <Text style={styles.importantBlockOuterText}>
                 {'Email: '}
               </Text>
-              <Text style={{fontSize: 20, fontWeight: '200'}}>{user.email}</Text>
+              <Text style={styles.importantBlockInnerText}>{user.email}</Text>
             </View>
-            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
+            <View style={styles.importantBlockContainer}>
+              <Text style={styles.importantBlockOuterText}>
                 {'Credits: '}
               </Text>
-              <Text style={{fontSize: 20, fontWeight: '200'}}>{credits}</Text>
+              <Text style={styles.importantBlockInnerText}>{credits}</Text>
             </View>
             {/* <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
               <Text style={{fontSize: 20, fontWeight: '800', color: '#039942'}}>
@@ -179,6 +183,17 @@ export default (
               <Text style={{fontSize: 20, fontWeight: '200'}}>{user.gpa}</Text>
             </View> */}
           </View>
+          {/* <View style={{ display: 'flex', width: '90%', alignSelf: 'center', marginVertical: '5%', gap: 10 }}>
+            <View style={{ display: 'flex', flexDirection: 'row', gap: 10, alignItems: 'center'}}>
+                <HelpCircle color={'black'} width={20} height={20}></HelpCircle>
+                <Text>Users who scan this QR Code can view your planned schedule.</Text>
+            </View>
+            <Image
+              style={{ width: 200, height: 200, borderColor: 'black', borderWidth: 2, alignSelf: 'center', borderRadius: 20}}
+              source={require('../../../../assets/image.png')}
+              alt="user profile picture"
+            ></Image>
+          </View> */}
           <View style={{ width: '90%', alignSelf: 'center', gap: 5 }}>
             <Button
               onPress={() => sendResetPassEmail(user.email)}
@@ -207,13 +222,6 @@ export default (
               <Trash2 color='white' width={25} height={25} strokeWidth={2.25}></Trash2>
             </TouchableOpacity>
           </View>
-          {/* <Text style={{fontSize: 20, fontWeight: '500', color: 'red'}}>Reset Password</Text>
-          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 5}}>
-            <Trash2 color='red' width={25} height={25} strokeWidth={3}></Trash2>
-            <Text style={{fontSize: 14, fontWeight: '700', color: 'red'}}>
-                Delete Account
-            </Text>
-          </View> */}
           <ProfileCustomizer
             viewProfileCustomizer={viewProfileCustomizer}
             setViewProfileCustomizer={setViewProfileCustomizer}
@@ -225,15 +233,6 @@ export default (
             setSearching={setSearching}
           >
           </ProfileCustomizer>
-          {/* <View style={{ display: 'flex', flexDirection: 'row', alignSelf: 'center', gap: 5, width: '75%', alignItems: 'center'}}>
-              <HelpCircle color={'black'} width={20} height={20}></HelpCircle>
-              <Text>Users who scan this QR Code can view your planned schedule.</Text>
-            </View>
-            <Image
-              style={{ width: '45%', height: '25%', borderColor: 'black', borderWidth: 2, alignSelf: 'center', borderRadius: 20}}
-              source={require('../../assets/image.png')}
-              alt="user profile picture"
-            ></Image> */}
         </View>
       </ScreenLayout>
     </Modal>

@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
 
-export const styles = StyleSheet.create({
+export default StyleSheet.create({
   modalHeaderContainer1: {
     display: 'flex',
     flexDirection: 'row',
@@ -44,5 +44,19 @@ export const styles = StyleSheet.create({
     borderColor: '#039942',
     borderRadius: 10,
     height: 50,
+  },
+  importantBlockOuterText: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#039942',
+  },
+  importantBlockContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  importantBlockInnerText: {
+    fontSize: 20,
+    fontWeight: '200',
   },
 })

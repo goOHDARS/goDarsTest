@@ -124,7 +124,7 @@ viewWhatIfDARS: boolean, setViewWhatIfDARS: React.Dispatch<React.SetStateAction<
               }, 850), console.log(viewProfile), setViewExtras(false), console.log(viewProfile)
             }} style={styles.innerModalContainer}>
               <User color={'hotpink'} width={25} height={25} strokeWidth={3}></User>
-              <Text style={{ color: 'hotpink', fontWeight: '700' }}>View Profile</Text>
+              <Text style={{ color: 'hotpink', fontWeight: '700' }}>My Profile</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => {
               setViewFulfilledBricks(true), setViewExtras(false)
