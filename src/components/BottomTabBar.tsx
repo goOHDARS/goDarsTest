@@ -1,3 +1,4 @@
+import { useAppSelector } from '@hooks/store'
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { useEffect, useState } from 'react'
 import {
@@ -56,6 +57,7 @@ const styles = StyleSheet.create({
 
 const BottomTabBar = ({ state, navigation }: BottomTabBarProps) => {
   const [keyboardShown, setKeyboardShown] = useState(false)
+  const onboarded = useAppSelector((state) => !!state.user.user?.onboarded)
 
   useEffect(() => {
     const keyboardShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -75,8 +77,8 @@ const BottomTabBar = ({ state, navigation }: BottomTabBarProps) => {
     }
   }, [])
 
-  // only hide if android
-  if (keyboardShown && Platform.OS === 'android') {
+  // only hide if android or not onboarded
+  if ((keyboardShown && Platform.OS === 'android') || !onboarded) {
     return null
   }
 
