@@ -165,9 +165,10 @@ const AdditionalInfoScreen = ({ route, navigation }: Props) => {
           <TextInput
             value={pid}
             onChangeText={(e) => setPid(e)}
-            placeholderTextColor={'#000000'}
+            placeholderTextColor={'#BBBBBB'}
             placeholder="101..."
             style={styles.textBoxInput}
+            clearTextOnFocus={false}
             autoCapitalize="none"
             autoCorrect={false}
             inputMode="decimal"

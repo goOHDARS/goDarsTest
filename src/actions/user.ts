@@ -1,5 +1,6 @@
 import { authRequestWithDispatch } from './api'
 import {
+  sendPasswordResetEmail,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
@@ -7,6 +8,7 @@ import {
 } from 'firebase/auth'
 import { auth } from '@configs/firebase'
 import { AppDispatch } from '../store'
+import { User } from 'src/reducers/user'
 
 export const GET_USER_REQUEST = '@@user/GET_USER_REQUEST'
 export const GET_USER_SUCCESS = '@@user/GET_USER_SUCCESS'
@@ -95,6 +97,49 @@ export const signUpUser = (
     })
 
     return dispatch(setLoggedIn())
+  }
+}
+
+export const deleteAccount = () => {
+  return async (dispatch: AppDispatch) => {
+    return authRequestWithDispatch({
+      dispatch,
+      method: 'DELETE',
+      endpoint: 'delete_users',
+      types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
+    })
+  }
+}
+
+export const sendResetPassEmail = (email: string) => {
+  return async (dispatch: AppDispatch) => {
+    dispatch({ type: SET_USER_REQUEST })
+    try {
+      await sendPasswordResetEmail(auth, email)
+      dispatch({ type: SET_USER_SUCCESS })
+    } catch (error: any) {
+      dispatch({ type: SET_USER_FAILURE, payload: error })
+    }
+  }
+}
+
+export const updateUser = (userInfo: User) => {
+  return async (dispatch: AppDispatch) => {
+    return authRequestWithDispatch({
+      dispatch,
+      endpoint: 'update_user',
+      method: 'PATCH',
+      types: [SET_USER_REQUEST, SET_USER_SUCCESS, SET_USER_FAILURE],
+      data: {
+        name: userInfo.name,
+        major: userInfo.major,
+        email: userInfo.email,
+        pid: userInfo.pid,
+        onboarded: userInfo.onboarded,
+        photoURL: userInfo.photoURL,
+        borderURLColor: userInfo.borderURLColor,
+      },
+    })
   }
 }
 

@@ -7,27 +7,37 @@ import {
   Text,
   ScrollView,
   Platform,
-  Modal,
-  TextInput,
-  Pressable,
+  Animated,
 } from 'react-native'
-import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown'
-import { HelpCircle, Info, Search } from 'react-native-feather'
-import useViewModel from './useViewModel'
+import {
+  AutocompleteDropdown,
+} from 'react-native-autocomplete-dropdown'
+import {
+  Info,
+  Search,
+} from 'react-native-feather'
 import styles from './styles'
+import useViewModel from './useViewModel'
+import CourseOverview from './CourseOverview'
 
 type Props = ReturnType<typeof useViewModel>
 
 const OnboardingRoot = (props: Props) => {
   return (
-    <ScreenLayout style={{ justifyContent: 'space-between' }}>
-      <View
+    <ScreenLayout style={{ justifyContent: 'space-between' }} onDismissFunc={() => {
+      props.editing ? props.setEditing(false) : undefined
+    }}>
+      <Animated.View
         style={{
+          transform: [
+            {translateY: props.translation},
+            {perspective: 1000}, // without this line this Animation will not render on Android while working fine on iOS
+          ],
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
           alignItems: 'center',
-          gap: 15,
+          gap: 10,
         }}
       >
         <Snackbar
@@ -57,6 +67,7 @@ const OnboardingRoot = (props: Props) => {
               controller={(controller) => {
                 props.dropdowncontroller.current = controller
               }}
+
               loading={props.coursesLoading}
               onChangeText={props.handleSetQuery}
               containerStyle={styles.textBoxInput}
@@ -88,14 +99,19 @@ const OnboardingRoot = (props: Props) => {
             />
           </View>
         </View>
-        <Text style={{ fontSize: 11 }}>
-          Please add all courses with their respective semester.
-        </Text>
+        <View style={{ display: 'flex', flexDirection: 'row', width: '90%', gap: 5}}>
+          <Info color={'black'} width={15}></Info>
+          <Text style={{ fontSize: 11 }}>
+            {'Below are suggested semesters for these courses,' +
+          ' edit the semester if the course was taken at a different time.' +
+          ' Scroll to view the whole name of the course in the Clipboard.'}
+          </Text>
+        </View>
         <View style={styles.clipboardContainer}>
           <Text style={styles.clipboard}>Clipboard</Text>
           <View style={styles.divider}></View>
         </View>
-      </View>
+      </Animated.View>
       <View
         style={{
           display: 'flex',
@@ -120,190 +136,58 @@ const OnboardingRoot = (props: Props) => {
           setCredits={props.setCredits}
           setSelectedCourses={props.setSelectedCourses}
           selectedCourses={props.selectedCourses}
-        />
+          setEditing={props.setEditing}
+        ></SelectedCourses>
       </ScrollView>
       <View
         style={{
           display: 'flex',
-          flexDirection: 'row',
-          width: '75%',
-          justifyContent: 'space-between',
-          marginTop: 10,
-        }}
-      >
-        <Text style={{ fontWeight: '700' }}>
-          {props.credits === 0 ? '' : 'Selected Credits '}
-        </Text>
-        <Text style={{ fontWeight: '700' }}>
-          {props.credits === 0 ? '' : props.credits.toFixed(2)}
-        </Text>
-      </View>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          width: '75%',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Text style={{ fontWeight: '700' }}>
-          {'Required Credits to Graduate '}
-        </Text>
-        <Text style={{ fontWeight: '700' }}>
-          {props.major?.credits_required
-            ? props.major?.credits_required.toFixed(2)
-            : '0.0'}
-        </Text>
-      </View>
-      <View
-        style={{
-          justifyContent: 'flex-end',
-          width: '90%',
-          marginBottom: 30,
-          marginTop: 10,
+          flexDirection: 'column',
+          width: '100%',
+          shadowColor: '#000', // For iOS shadow
+          shadowOffset: { width: 0, height: -5 }, // Position the shadow above
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
+          backgroundColor: '#fff', // Ensure background color to see the shadow
+          alignItems: 'center',
           gap: 10,
         }}
       >
+        <View style={{ width: '75%', alignContent: 'center', marginTop: '2.5%' }}>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={{ fontWeight: '700' }}>
+              {props.credits === 0 ? '' : 'Selected Credits '}
+            </Text>
+            <Text style={{ fontWeight: '700' }}>
+              {props.credits === 0 ? '' : props.credits.toFixed(2)}
+            </Text>
+          </View>
+          <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <Text style={{ fontWeight: '700' }}>
+              {'Required Credits to Graduate '}
+            </Text>
+            <Text style={{ fontWeight: '700' }}>
+              {props.major?.credits_required ? props.major?.credits_required.toFixed(2) : '0.0'}
+            </Text>
+          </View>
+        </View>
+
         <Button
           disabled={props.selectedCourses.length === 0}
-          fullWidth
-          onPress={() => props.setModalVisible(true)}
+          fullWidth = {false}
+          style={{ width: '90%', marginBottom: '5%' }}
+          onPress={props.handleEditSemesters}
         >
-          Edit Semesters
+          Continue
         </Button>
-        <Modal
-          animationType="slide"
-          visible={props.modalVisible}
-          onRequestClose={() => props.setModalVisible(false)}
-          presentationStyle="pageSheet"
+        <CourseOverview
+          modalVisible={props.modalVisible}
+          setModalVisible={props.setModalVisible}
+          selectedCourses={props.selectedCourses}
+          setSelectedCourses={props.setSelectedCourses}
+          loading={props.userLoading}
         >
-          <ScreenLayout>
-            <View
-              style={{
-                display: 'flex',
-                width: '100%',
-                height: '90%',
-                alignItems: 'center',
-              }}
-            >
-              <View
-                style={{
-                  display: 'flex',
-                  marginVertical: '10%',
-                  alignItems: 'center',
-                }}
-              >
-                <Text
-                  style={{ fontSize: 28, color: '#039942', fontWeight: '900' }}
-                >
-                  Adjust your semesters
-                </Text>
-                <View
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    gap: 10,
-                    width: '90%',
-                    marginVertical: '5%',
-                  }}
-                >
-                  <Info color={'black'} width={15}></Info>
-                  <Text style={{ fontSize: 11 }}>
-                    {'Below are suggested semesters for these courses,' +
-                      ' edit the semester if the course was taken at a different time'}
-                  </Text>
-                </View>
-              </View>
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  marginBottom: '2.5%',
-                  marginTop: '2.5%',
-                  width: '75%',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <Text style={styles.editCourseTextLeft}>Course Name</Text>
-                <Text style={styles.editCourseText}>Semester</Text>
-                <Text style={styles.editCourseTextRight}>Credits</Text>
-              </View>
-              <ScrollView style={{ width: '75%' }}>
-                {props.selectedCourses.map((course, index) => {
-                  return (
-                    <Pressable
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        marginBottom: 10,
-                      }}
-                      key={index}
-                    >
-                      <Text style={styles.editCourseTextLeft}>
-                        {course.shortName}
-                      </Text>
-                      <TextInput
-                        value={
-                          course?.semester?.toString() === '0'
-                            ? ''
-                            : course.semester?.toString()
-                        }
-                        onChangeText={(e) => {
-                          props.handleEditSemester(course, e)
-                        }}
-                        placeholder="edit me"
-                        style={styles.editCourseText}
-                        inputMode="decimal"
-                      />
-                      <Text style={styles.editCourseTextRight}>
-                        {course.credits}
-                      </Text>
-                    </Pressable>
-                  )
-                })}
-              </ScrollView>
-            </View>
-            <View
-              style={{
-                display: 'flex',
-                width: '90%',
-                height: '10%',
-                alignContent: 'flex-end',
-                justifyContent: 'center',
-                gap: 5,
-              }}
-            >
-              <View
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <HelpCircle strokeWidth={3} />
-                <Text style={{ fontSize: 12, marginLeft: 5 }}>
-                  This allows goOHDARS to plan future schedules
-                </Text>
-              </View>
-              <Button
-                disabled={
-                  props.selectedCourses.filter(
-                    (course) =>
-                      course.semester?.toString() === '' ||
-                      course.semester === 0
-                  ).length > 0
-                }
-                fullWidth
-                onPress={props.handleContinuePress}
-                loading={props.userLoading}
-              >
-                Finish Account
-              </Button>
-            </View>
-          </ScreenLayout>
-        </Modal>
+        </CourseOverview>
       </View>
     </ScreenLayout>
   )

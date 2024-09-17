@@ -5,10 +5,10 @@ import {
   resetQueryCourses,
   GET_COURSES_SUCCESS,
 } from '@actions/courses'
-import { getCurrentUser } from '@actions/user'
+import { getCurrentUser, SET_USER_SUCCESS } from '@actions/user'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Alert } from 'react-native'
+import { Alert, Animated, ScrollView } from 'react-native'
 import {
   AutocompleteDropdownRef,
   TAutocompleteDropdownItem,
@@ -29,6 +29,13 @@ const useViewModel = () => {
   const [selectedCourses, setSelectedCourses] = useState<CourseBrief[]>([])
   const [modalVisible, setModalVisible] = useState(false)
   const [initialized, setInitialized] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [typing, setTyping] = useState(false)
+
+  const scrollViewRef = useRef<ScrollView>(null)
+
+  const translation = useRef(new Animated.Value(0)).current
+
   const dropdowncontroller = useRef<AutocompleteDropdownRef>()
 
   const dropdownData = useMemo(
@@ -115,11 +122,19 @@ const useViewModel = () => {
     }))
     // There were some promise resolution issues with the following two lines
     await dispatch(setInitialCourses(omitArr))
-    await dispatch(getCurrentUser())
     dispatch({
       type: GET_COURSES_SUCCESS,
       payload: selectedCourses,
     })
+
+    dispatch({
+      type: SET_USER_SUCCESS,
+      payload: {
+        ...user,
+        credits: selectedCourses.reduce((acc, course) => acc + course.credits, 0),
+      },
+    })
+    await dispatch(getCurrentUser())
   }
 
   const handleSetQuery = (e: string) => {
@@ -165,6 +180,10 @@ const useViewModel = () => {
     }
   }
 
+  const handleEditSemesters = () => {
+    setModalVisible(true)
+  }
+
   const handleResetQuery = () => {
     dispatch(resetQueryCourses())
   }
@@ -184,6 +203,20 @@ const useViewModel = () => {
       setInitialized(true)
     }
   }, [initialCourses])
+
+  useEffect(() => {
+    if (editing) {
+      Animated.timing(translation, {
+        toValue: -50,
+        useNativeDriver: true,
+      }).start()
+    } else {
+      Animated.timing(translation, {
+        toValue: 0,
+        useNativeDriver: true,
+      }).start()
+    }
+  }, [editing])
 
   return {
     initialCourses,
@@ -208,6 +241,13 @@ const useViewModel = () => {
     handleSetQuery,
     handleEditSemester,
     handleResetQuery,
+    setEditing,
+    editing,
+    typing,
+    setTyping,
+    translation,
+    scrollViewRef,
+    handleEditSemesters,
   }
 }
 

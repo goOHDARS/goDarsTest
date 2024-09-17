@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { resetUserErrors } from '@actions/user'
 import { Eye } from 'react-native-feather'
 import PasswordRequirements from '@components/PasswordRequirements'
+import { isProfane } from 'no-profanity'
 
 const styles = StyleSheet.create({
   form: {
@@ -21,17 +22,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     width: '90%',
+    gap: 10,
   },
   header: {
     fontSize: 50,
     fontWeight: '900',
     color: '#039942',
+    marginTop: '10%',
   },
   subHeader: {
     fontSize: 40,
     fontWeight: '700',
     marginBottom: 20,
-    marginTop: '30%',
+    marginTop: '5%',
   },
   textBox: {
     display: 'flex',
@@ -49,7 +52,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: '#039942',
-    marginBottom: 20,
     borderRadius: 10,
     height: 50,
     fontSize: 20,
@@ -102,17 +104,28 @@ type Props = NativeStackScreenProps<
 
 const SignUpScreen = ({ navigation }: Props) => {
   const dispatch = useAppDispatch()
-  const [name, setName] = useState('')
+
+  const [FName, setFName] = useState('')
+  const [LName, setLName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
   const errors = useAppSelector((state) => state.user.error)
 
+  const checkNames = (name: string) => {
+    return (
+      name.length < 1 ||
+      name.match(/[^A-Za-z0-9]/) !== null ||
+      name.match(/[0-9]/) !== null ||
+      isProfane(name)
+    )
+  }
+
   const handlePress = () => {
     dispatch(resetUserErrors())
     navigation.push('/additional-info', {
-      name,
+      name: FName + ' ' + LName,
       email,
       password,
     })
@@ -128,16 +141,29 @@ const SignUpScreen = ({ navigation }: Props) => {
       <Text style={styles.header}>goOHDARS</Text>
       <Text style={styles.subHeader}>Sign Up</Text>
       <View style={styles.form}>
-        <TextInput
-          value={name}
-          onChangeText={(e) => setName(e)}
-          placeholderTextColor={'black'}
-          placeholder="Full Name"
-          style={styles.textBox2}
-          autoCapitalize="none"
-          autoCorrect={false}
-          inputMode="text"
-        />
+        <View style={{ width: '100%', gap: 10, marginBottom: 15 }}>
+          <TextInput
+            value={FName}
+            onChangeText={(e) => setFName(e)}
+            placeholderTextColor={'black'}
+            placeholder="First Name"
+            style={styles.textBox2}
+            autoCapitalize="none"
+            autoCorrect={false}
+            inputMode="text"
+          />
+          <TextInput
+            value={LName}
+            onChangeText={(e) => setLName(e)}
+            placeholderTextColor={'black'}
+            placeholder="Last Name"
+            style={styles.textBox2}
+            autoCapitalize="none"
+            autoCorrect={false}
+            inputMode="text"
+          />
+          { (checkNames(FName) || checkNames(LName)) ? <Text style={{ alignSelf: 'center', fontWeight: '800', color: '#039942', fontSize: 10 }}>Please enter a valid name</Text>: null}
+        </View>
         <TextInput
           value={email}
           onChangeText={(e) => setEmail(e)}
@@ -189,13 +215,17 @@ const SignUpScreen = ({ navigation }: Props) => {
         <PasswordRequirements password={password} />
         <Button
           disabled={
-            !name ||
+            !FName ||
+            !LName ||
             !email ||
             !password ||
             password.length < 8 ||
             !password.match(/[^A-Za-z0-9]/) ||
             !password.match(/[A-Z]/) ||
-            !password.match(/[0-9]/)
+            !password.match(/[0-9]/) ||
+
+            checkNames(FName) ||
+            checkNames(LName)
           }
           fullWidth
           onPress={handlePress}

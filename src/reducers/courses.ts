@@ -15,7 +15,7 @@ export type CourseBrief = {
 }
 
 // an overall course
-type Course = {
+export type Course = {
   id: string
   college: string
   credits: number
@@ -39,6 +39,7 @@ type CoursesState = BaseState & {
   selectedCourse?: Course
   courses?: CourseBrief[]
   queryResults?: CourseBrief[]
+  totalCredits?: number
 }
 
 const initialState: CoursesState = {
@@ -62,6 +63,9 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
         ...state,
         loading: false,
         courses: action.payload as CourseBrief[],
+        totalCredits: (action.payload as CourseBrief[]).reduce((accum, course) => {
+          return accum + course.credits
+        }, 0),
         error: undefined,
       }
     case courses.ADD_COURSE_SUCCESS:
@@ -69,6 +73,7 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
         ...state,
         loading: false,
         courses: state.courses?.concat(action.payload as CourseBrief),
+        totalCredits: state.totalCredits ? state.totalCredits + (action.payload as CourseBrief).credits : state.totalCredits,
         error: undefined,
       }
     case courses.REMOVE_COURSE_SUCCESS:
@@ -80,6 +85,7 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
             course.shortName !==
             (action.payload as { courseName: string }).courseName
         ),
+        totalCredits: state.totalCredits ? state.totalCredits - (action.payload as CourseBrief).credits : state.totalCredits,
         error: undefined,
       }
     case courses.GET_INFO_SUCCESS:

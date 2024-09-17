@@ -3,7 +3,7 @@ import * as user from '@actions/user'
 import { BaseState, Error } from '.'
 import { removeKey, setKey } from '@utils/storage'
 
-type User = {
+export type User = {
   id: string
   name: string
   major: string
@@ -11,8 +11,11 @@ type User = {
   pid: string
   year: number
   semester: number
+  // degree: string
+  // gpa: number
   onboarded: boolean
   photoURL: string
+  borderURLColor: string
 }
 
 type UserState = BaseState & {
