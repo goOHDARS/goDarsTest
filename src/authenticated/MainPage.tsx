@@ -14,8 +14,8 @@ import {
 import React, { useRef, useState } from 'react'
 import Onboarding from './Onboarding'
 import Semesters from '@components/Semesters'
-import Dashboard from './Dashboard/Dashboard'
-import Profile from './Dashboard/Profile/Profile'
+import Dashboard from './Dashboard'
+import Profile from './Dashboard/Profile'
 
 type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/app'>
 

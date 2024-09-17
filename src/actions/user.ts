@@ -125,7 +125,7 @@ export const sendResetPassEmail = (email: string) => {
 
 export const updateUser = (userInfo: User) => {
   return async (dispatch: AppDispatch) => {
-    await authRequestWithDispatch({
+    return authRequestWithDispatch({
       dispatch,
       endpoint: 'update_user',
       method: 'PATCH',
@@ -140,7 +140,6 @@ export const updateUser = (userInfo: User) => {
         borderURLColor: userInfo.borderURLColor,
       },
     })
-    // dispatch({ type: SET_USER_SUCCESS })
   }
 }
 

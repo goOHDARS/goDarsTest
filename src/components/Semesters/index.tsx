@@ -93,34 +93,4 @@ export default () => {
   }
 
   return cards
-
-  // <Pressable>
-  //   <View
-  //     key={i}
-  //     style={
-  //       bool ? styles.fallSemesterContainer : styles.springSemesterContainer
-  //     }
-  //   >
-  //     <ScrollView>
-  //       <View style={bool ? styles.fallSemester : styles.springSemester}>
-  //         {list?.map((course, index) => {
-  //           return (
-  //             <Pressable key={index}>
-  //               <View style={styles.classContainer}>
-  //                 <Text style={styles.semesterInnerText}>{course.shortName}</Text>
-  //                 <Text style={styles.semesterInnerText}>{course.credits}</Text>
-  //               </View>
-  //             </Pressable>
-  //           )
-  //         })}
-  //       </View>
-  //     </ScrollView>
-
-  //     <Text
-  //       style={bool ? styles.fallSemesterText : styles.springSemesterText}
-  //     >
-  //       {bool ? 'Fall' : 'Spring'}
-  //     </Text>
-  //   </View>
-  // </Pressable>
 }
