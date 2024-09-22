@@ -1,7 +1,7 @@
 import ScreenLayout from '@components/ScreenLayout'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import { RootAuthenticatedTabBarParamList } from '.'
-import ChatScreen from '@components/ChatScreen'
+import { RootAuthenticatedTabBarParamList } from '..'
+import ChatScreen from '../features/ChatScreen'
 
 type Props = BottomTabScreenProps<
   RootAuthenticatedTabBarParamList,

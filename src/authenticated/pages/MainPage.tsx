@@ -1,7 +1,7 @@
 import ScreenLayout from '@components/ScreenLayout'
 import { useAppDispatch, useAppSelector } from '@hooks/store'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import { RootAuthenticatedTabBarParamList } from '.'
+import { RootAuthenticatedTabBarParamList } from '..'
 import {
   View,
   Text,
@@ -12,10 +12,10 @@ import {
   Pressable,
 } from 'react-native'
 import React, { useRef, useState } from 'react'
-import Onboarding from './Onboarding'
+import Onboarding from '../features/Onboarding'
 import Semesters from '@components/Semesters'
-import Dashboard from './Dashboard'
-import Profile from './Dashboard/Profile'
+import Dashboard from '../features/Dashboard'
+import Profile from '../features/Dashboard/Profile'
 
 type Props = BottomTabScreenProps<RootAuthenticatedTabBarParamList, '/app'>
 
