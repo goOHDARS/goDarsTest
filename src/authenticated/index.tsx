@@ -1,9 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import MainPage from './MainPage'
-import CourseSelect from './CourseSelect'
-import Overview from './Overview'
+import MainPage from './pages/MainPage'
+import CourseSelect from './pages/CourseSelect'
+import Overview from './pages/Overview'
 import BottomTabBar from '@components/BottomTabBar'
-import Assistant from './Assistant'
+import Assistant from './pages/Assistant'
 
 export type RootAuthenticatedTabBarParamList = {
   '/app': undefined

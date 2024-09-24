@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from 'react-native'
-import Button from '../Button'
+import Button from '@components/Button'
 import Loader from 'react-native-three-dots'
 import styles from './styles'
 import useViewModel from './useViewModel'
