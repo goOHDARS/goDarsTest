@@ -7,6 +7,7 @@ export default StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 20,
+    paddingHorizontal: 30,
   },
   title: {
     fontSize: 20,
@@ -15,10 +16,5 @@ export default StyleSheet.create({
   subtitle: {
     fontSize: 18,
     fontWeight: '500',
-  },
-  xButton: {
-    position: 'absolute',
-    right: 20,
-    top: 20,
   },
 })

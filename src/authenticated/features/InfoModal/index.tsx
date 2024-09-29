@@ -74,7 +74,7 @@ const InfoModalRoot = (props: RootProps) => {
           }}
         >
           <TouchableOpacity
-            style={{ padding: 5, borderRadius: 10 }}
+            style={{ padding: 5, borderRadius: 10, marginRight: -10 }}
             onPress={() => props.setVisible(false)}
           >
             <X color="#000000" strokeWidth={3} width={25} height={25} />

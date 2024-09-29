@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import Divider from '@components/Divider'
 import { CourseBrief } from 'src/reducers/courses'
 import { useAppSelector } from '@hooks/store'
@@ -43,7 +43,7 @@ export default () => {
       <ScrollView contentContainerStyle={{ gap: 10 }}>
         {list?.map((course, index) => {
           return (
-            <Pressable
+            <TouchableOpacity
               onPress={onBriefPress(course)}
               key={index}
               style={styles.classContainer}
@@ -52,7 +52,7 @@ export default () => {
               <Text style={styles.semesterInnerTextCredits}>
                 {course.credits}
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           )
         })}
       </ScrollView>
