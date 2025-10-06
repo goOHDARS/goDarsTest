@@ -10,6 +10,7 @@ export type CourseBrief = {
   shortName: string
   credits: number
   semester: number | null
+  suggestion?: boolean
   category?: string
   subcategory?: string
 }
@@ -31,7 +32,7 @@ export type UserCourse = {
   id: string
   course: string
   semester: number
-  category: string
+  category?: string
   subcategory?: string
 }
 
@@ -63,9 +64,12 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
         ...state,
         loading: false,
         courses: action.payload as CourseBrief[],
-        totalCredits: (action.payload as CourseBrief[]).reduce((accum, course) => {
-          return accum + course.credits
-        }, 0),
+        totalCredits: (action.payload as CourseBrief[]).reduce(
+          (accum, course) => {
+            return accum + course.credits
+          },
+          0
+        ),
         error: undefined,
       }
     case courses.ADD_COURSE_SUCCESS:
@@ -73,7 +77,9 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
         ...state,
         loading: false,
         courses: state.courses?.concat(action.payload as CourseBrief),
-        totalCredits: state.totalCredits ? state.totalCredits + (action.payload as CourseBrief).credits : state.totalCredits,
+        totalCredits: state.totalCredits
+          ? state.totalCredits + (action.payload as CourseBrief).credits
+          : state.totalCredits,
         error: undefined,
       }
     case courses.REMOVE_COURSE_SUCCESS:
@@ -85,7 +91,9 @@ export default (state = initialState, action: UnknownAction): CoursesState => {
             course.shortName !==
             (action.payload as { courseName: string }).courseName
         ),
-        totalCredits: state.totalCredits ? state.totalCredits - (action.payload as CourseBrief).credits : state.totalCredits,
+        totalCredits: state.totalCredits
+          ? state.totalCredits - (action.payload as CourseBrief).credits
+          : state.totalCredits,
         error: undefined,
       }
     case courses.GET_INFO_SUCCESS:

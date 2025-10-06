@@ -13,7 +13,7 @@ import {
 } from 'react-native'
 import React, { useRef, useState } from 'react'
 import Onboarding from '../features/Onboarding'
-import Semesters from '@components/Semesters'
+import Semesters from '../features/Dashboard/Semesters'
 import Dashboard from '../features/Dashboard'
 import Profile from '../features/Dashboard/Profile'
 
